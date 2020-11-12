@@ -90,19 +90,7 @@ def delete_gazebo_models():
         print("Delete Model service call failed: {0}".format(e))
 
 def main():
-    """SDK Inverse Kinematics Pick and Place Example
 
-    A Pick and Place example using the Rethink Inverse Kinematics
-    Service which returns the joint angles a requested Cartesian Pose.
-    This ROS Service client is used to request both pick and place
-    poses in the /base frame of the robot.
-
-    Note: This is a highly scripted and tuned demo. The object location
-    is "known" and movement is done completely open loop. It is expected
-    behavior that Sawyer will eventually mis-pick or drop the ball. You
-    can improve on this demo by adding perception and feedback to close
-    the loop.
-    """
     rospy.init_node("ik_pick_and_place_demo")
     # Load Gazebo Models via Spawning Services
     # Note that the models reference is the /world frame
