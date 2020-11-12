@@ -1,0 +1,134 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="cafe_table">
+    <static>true</static>
+    <link name="link">
+      <collision name="surface">
+        <pose>0 0 0.755 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.913 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="column">
+        <pose>0 0 0.37 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.042 0.042 0.74</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="left_wall">
+        <pose>0 -0.457 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.010 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="right_wall">
+        <pose>0 0.457 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.010 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="front_wall">
+        <pose>-0.457 0 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.010 0.913 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="back_wall">
+        <pose>0.457 0 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.010 0.913 0.10</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <collision name="base">
+        <pose>0 0 0.02 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.56 0.56 0.04</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name="visual_surface">
+        <pose>0 0 0.755 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.913 0.04</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_column">
+        <pose>0 0 0.37 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.042 0.042 0.74</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_left_wall">
+        <pose>0 -0.457 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.010 0.10</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_right_wall">
+        <pose>0 0.457 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.913 0.010 0.10</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_front_wall">
+        <pose>-0.457 0 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.010 0.913 0.10</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_back_wall">
+        <pose>0.457 0 0.785 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.010 0.913 0.10</size>
+          </box>
+        </geometry>
+      </visual>
+
+      <visual name="visual_base">
+        <pose>0 0 0.02 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.56 0.56 0.04</size>
+          </box>
+        </geometry>
+      </visual>
+
+    </link>
+  </model>
+</sdf>

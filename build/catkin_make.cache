@@ -1,0 +1,2 @@
+ik:planning
+-DCATKIN_DEVEL_PREFIX=/home/ajain23/ros_workspaces/lab5/devel -DCMAKE_INSTALL_PREFIX=/home/ajain23/ros_workspaces/lab5/install -G Unix Makefiles
