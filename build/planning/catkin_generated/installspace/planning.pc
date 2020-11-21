@@ -1,8 +1,0 @@
-prefix=/home/ajain23/ros_workspaces/lab5/install
-
-Name: planning
-Description: Description of planning
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
