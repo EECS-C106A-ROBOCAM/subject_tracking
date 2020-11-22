@@ -67,7 +67,7 @@ def delete_gazebo_models():
     except rospy.ServiceException, e:
         print("Delete Model service call failed: {0}".format(e))
 
-def simulate_movement(reference_frame="world"):
+def simulate_movement(reference_frame="world", max_speed=1):
     move_ball = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
     get_ball = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
 
@@ -75,7 +75,7 @@ def simulate_movement(reference_frame="world"):
     try:
         while not rospy.is_shutdown():
 
-            speed = np.random.uniform(0, 1)
+            speed = np.random.uniform(0, max_speed)
             theta = np.random.uniform(0, 360)
 
             twist = Twist()
