@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-"""
-Path Planning Script for Lab 5
-Author: Tiffany Cappellari
-"""
 import sys
 import rospy
 import tf2_ros
