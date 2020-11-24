@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(planning)
+project(manipulator_sim)
 
 # add_compile_options(-std=c++11)
 

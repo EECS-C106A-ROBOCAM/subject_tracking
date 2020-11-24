@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>planning</name>
+  <name>manipulator_sim</name>
   <version>0.0.0</version>
-  <description>A package for path planning to track and follow a moving object.</description>
+  <description>A package for manipulator motion control to track and follow a moving object.</description>
 
   <maintainer email="ayush.jain@berkeley.edu">Ayush Jain</maintainer>
 
