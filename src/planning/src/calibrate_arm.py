@@ -48,12 +48,12 @@ def moveTo(goal, limb):
         goal = tf2_geometry_msgs.do_transform_pose(Pose(goal, orient), transform).pose
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
         print 'UH OH UH OH'
-        continue
+        pass
 
     limb_joints = ik_solver.ik_solve('left', goal, orient)
 
     if limb_joints != -1:
-        left.move_to_joint_positions(limb_joints)
+        limb.move_to_joint_positions(limb_joints)
         print "done!"
 
 
