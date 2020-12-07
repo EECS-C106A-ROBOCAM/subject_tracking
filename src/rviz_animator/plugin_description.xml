@@ -1,0 +1,9 @@
+<library path="lib/librviz_animator">
+  <class name="rviz_animator/KeyframeTool"
+         type="rviz_animator::KeyframeTool"
+         base_class_type="rviz::Tool">
+    <description>
+      Tool for planting keyframe markers on the ground plane in rviz.
+    </description>
+  </class>
+</library>

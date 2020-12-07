@@ -10,9 +10,9 @@ from baxter_interface import Limb
 from tf2_geometry_msgs import do_transform_pose
 from moveit_msgs.msg import OrientationConstraint
 from geometry_msgs.msg import (    
-    Point,
-    Quaternion,
-    Pose,
+	Point,
+	Quaternion,
+	Pose,
 	PoseStamped
 )
 
