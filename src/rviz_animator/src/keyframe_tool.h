@@ -2,28 +2,25 @@
 #define KEYFRAME_TOOL_H
 
 #include <rviz/tool.h>
+#include <rviz/properties/string_property.h>
+#include <rviz/properties/bool_property.h>
 
-namespace Ogre
-{
-class SceneNode;
-class Vector3;
-class Quaternion;
-}
-
-namespace rviz
-{
-class Property;
-class StringProperty;
-class BoolProperty;
-class VectorProperty;
-class QuaternionProperty;
-class FloatProperty;
-class VisualizationManager;
-class ViewportMouseEvent;
-}
+#include <OGRE/OgreSceneNode.h>
+#include <OGRE/OgreSceneManager.h>
+#include <OGRE/OgreEntity.h>
 
 namespace rviz_animator
 {
+
+struct Keyframe {
+  Ogre::SceneNode* node_;
+  Ogre::Vector3 position_;
+  Ogre::Quaternion orientation_;
+  float timestamp_;
+  int id_;
+  std::string label_;
+  bool operator< (const Keyframe& other) {return timestamp_ < other.timestamp_;}
+};
 
 class KeyframeTool: public rviz::Tool
 {
@@ -43,18 +40,22 @@ public:
   virtual void save( rviz::Config config ) const;
 
 private Q_SLOTS:
-  void updateKeyframePosition(int keyframe_index);
-  void updateKeyframeOrientation(int keyframe_index);
+  void updateKeyframePosition(int keyframe_id);
+  void updateKeyframeOrientation(int keyframe_id);
+  void updateKeyframeTimestamp(int keyframe_id);
+  void updateKeyframeLabel(int property_index);
 
 private:
-  void makeKeyframe( const Ogre::Vector3& position, const Ogre::Quaternion& orientation );
+  Ogre::SceneNode* createNode( const Ogre::Vector3& position, const Ogre::Quaternion& orientation );
+  void sortKeyframes();
+  void renderKeyframeProperties();
 
-  std::vector<Ogre::SceneNode*> keyframe_nodes_;
+  std::vector<Keyframe> keyframes_;
   std::string keyframe_resource_;
   rviz::Property* keyframes_property_;
   rviz::StringProperty* topic_property_;
   rviz::BoolProperty* publish_property_;
-
+  static int current_keyframe_id;
 };
 
 } // end namespace rviz_animator

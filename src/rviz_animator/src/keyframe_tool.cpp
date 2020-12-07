@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreEntity.h>
@@ -28,9 +30,9 @@ KeyframeTool::KeyframeTool()
 
 KeyframeTool::~KeyframeTool()
 {
-  for( unsigned i = 0; i < keyframe_nodes_.size(); i++ )
+  for (auto keyframe : keyframes_)
   {
-    scene_manager_->destroySceneNode( keyframe_nodes_[ i ]);
+    scene_manager_->destroySceneNode(keyframe.node_);
   }
 }
 
@@ -53,58 +55,91 @@ void KeyframeTool::onInitialize()
   getPropertyContainer()->addChild( publish_property_ );
 }
 
-void KeyframeTool::activate()
-{
+void KeyframeTool::activate() {}
 
+void KeyframeTool::deactivate() {}
+
+void KeyframeTool::updateKeyframePosition(int property_index)
+{
+  auto& keyframe = keyframes_[property_index];
+  keyframe.position_ = dynamic_cast<rviz::VectorProperty*>(keyframes_property_->childAt(property_index)->childAt(0))->getVector();
+  keyframe.node_->setPosition(keyframe.position_);
 }
 
-void KeyframeTool::deactivate()
+void KeyframeTool::updateKeyframeOrientation(int property_index)
 {
-
+  auto& keyframe = keyframes_[property_index];
+  keyframe.orientation_ = dynamic_cast<rviz::QuaternionProperty*>(keyframes_property_->childAt(property_index)->childAt(1))->getQuaternion();
+  keyframe.node_->setOrientation(keyframe.orientation_);
 }
 
-void KeyframeTool::updateKeyframePosition(int keyframe_index)
+
+void KeyframeTool::updateKeyframeTimestamp(int property_index)
 {
-  if (keyframe_index >= keyframe_nodes_.size()) return;
-  keyframe_nodes_[keyframe_index]->setPosition(dynamic_cast<rviz::VectorProperty*>(keyframes_property_->childAt(keyframe_index)->childAt(0))->getVector());
+  auto& keyframe = keyframes_[property_index];
+  keyframe.timestamp_ = dynamic_cast<rviz::FloatProperty*>(keyframes_property_->childAt(property_index)->childAt(2))->getFloat();
+  sortKeyframes();
 }
 
-void KeyframeTool::updateKeyframeOrientation(int keyframe_index)
+void KeyframeTool::updateKeyframeLabel(int property_index)
 {
-  if (keyframe_index >= keyframe_nodes_.size()) return;
-  keyframe_nodes_[keyframe_index]->setOrientation(dynamic_cast<rviz::QuaternionProperty*>(keyframes_property_->childAt(keyframe_index)->childAt(1))->getQuaternion());
+  auto& keyframe = keyframes_[property_index];
+  keyframe.label_ = dynamic_cast<rviz::StringProperty*>(keyframes_property_->childAt(property_index)->childAt(3))->getStdString();
+}
+
+void KeyframeTool::sortKeyframes()
+{
+  std::sort(keyframes_.begin(), keyframes_.end());
+  renderKeyframeProperties();
+}
+
+void KeyframeTool::renderKeyframeProperties() {
+  for (int i = 0; i < keyframes_.size(); ++i) {
+    auto keyframe = keyframes_[i];
+    auto keyframe_property = keyframes_property_->childAt(i);
+
+    dynamic_cast<rviz::VectorProperty*>(keyframe_property->childAt(0))->setVector(keyframe.position_);
+    dynamic_cast<rviz::QuaternionProperty*>(keyframe_property->childAt(1))->setQuaternion(keyframe.orientation_);
+    dynamic_cast<rviz::FloatProperty*>(keyframe_property->childAt(2))->setFloat(keyframe.timestamp_);
+    dynamic_cast<rviz::StringProperty*>(keyframe_property->childAt(3))->setStdString(keyframe.label_);
+  }
 }
 
 int KeyframeTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 {
+  Ogre::Camera* camera = scene_manager_->getCurrentViewport()->getCamera();
+  auto node = createNode(camera->getPosition(), camera->getOrientation());
+  auto keyframe = Keyframe{node, camera->getPosition(), camera->getOrientation(), 0, current_keyframe_id, "keyframe_id_" + std::to_string(current_keyframe_id)};
+  keyframes_.push_back(keyframe);
+  current_keyframe_id++;
 
-  rviz::Property* keyframe_property = new rviz::Property("Keyframe " + QString::number( keyframe_nodes_.size()));
+  rviz::Property* keyframe_property = new rviz::Property("Keyframe " + QString::number(keyframes_property_->numChildren()));
   rviz::VectorProperty* keyframe_position_property = new rviz::VectorProperty("Position");
   rviz::QuaternionProperty* keyframe_orientation_property = new rviz::QuaternionProperty("Orientation");
   rviz::FloatProperty* keyframe_timestamp_property = new rviz::FloatProperty("Timestamp");
- 
-  int keyframe_index = keyframe_nodes_.size();
-  connect(keyframe_position_property, &rviz::VectorProperty::changed, this, [=](){ updateKeyframePosition(keyframe_index); });
-  connect(keyframe_orientation_property, &rviz::QuaternionProperty::changed, this, [=](){ updateKeyframeOrientation(keyframe_index); });
+  rviz::StringProperty* keyframe_label_property = new rviz::StringProperty("Label");
+
+  keyframe_position_property ->setVector(keyframe.position_);
+  keyframe_orientation_property->setQuaternion(keyframe.orientation_);
+  keyframe_timestamp_property->setFloat(keyframe.timestamp_);
+  keyframe_label_property->setStdString(keyframe.label_);
+
+  int property_index = keyframes_property_->numChildren();
+  connect(keyframe_position_property, &rviz::VectorProperty::changed, this, [=](){ updateKeyframePosition(property_index); });
+  connect(keyframe_orientation_property, &rviz::QuaternionProperty::changed, this, [=](){ updateKeyframeOrientation(property_index); });
+  connect(keyframe_timestamp_property, &rviz::FloatProperty::changed, this, [=](){ updateKeyframeTimestamp(property_index); });
+  connect(keyframe_label_property, &rviz::StringProperty::changed, this, [=](){ updateKeyframeLabel(property_index); });
 
   keyframes_property_->addChild( keyframe_property );
   keyframe_property->addChild( keyframe_position_property );
   keyframe_property->addChild( keyframe_orientation_property );
   keyframe_property->addChild( keyframe_timestamp_property );
-
-  Ogre::Camera* camera = scene_manager_->getCurrentViewport()->getCamera();
-
-  keyframe_position_property ->setVector(camera->getPosition());
-  keyframe_orientation_property->setQuaternion(camera->getOrientation());
-  keyframe_timestamp_property->setValue(0);
-
-  makeKeyframe(camera->getPosition(), camera->getOrientation());
+  keyframe_property->addChild( keyframe_label_property );
 
   return Render | Finished;
-
 }
 
-void KeyframeTool::makeKeyframe( const Ogre::Vector3& position, const Ogre::Quaternion& orientation )
+Ogre::SceneNode* KeyframeTool::createNode( const Ogre::Vector3& position, const Ogre::Quaternion& orientation )
 {
   Ogre::SceneNode* node = scene_manager_->getRootSceneNode()->createChildSceneNode();
   Ogre::Entity* entity = scene_manager_->createEntity( keyframe_resource_ );
@@ -114,7 +149,8 @@ void KeyframeTool::makeKeyframe( const Ogre::Vector3& position, const Ogre::Quat
   node->setPosition(position);
   node->setOrientation(orientation);
   node->setVisible( true );
-  keyframe_nodes_.push_back( node );
+
+  return node;
 }
 
 void KeyframeTool::save( rviz::Config config ) const
@@ -172,10 +208,12 @@ void KeyframeTool::load( const rviz::Config& config )
 
     keyframes_property_->addChild( keyframe_property );
 
-    makeKeyframe( keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion() );
+    auto node = createNode( keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion() );
+    // keyframes_.push_back(Keyframe{node, keyframe_timestamp_property->getFloat(), current_keyframe_id++, current_keyframe_id});
   }
 }
 
+int KeyframeTool::current_keyframe_id = 0;
 
 } // end namespace rviz_animator
 
