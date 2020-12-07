@@ -44,6 +44,8 @@ private Q_SLOTS:
   void updateKeyframeOrientation(int keyframe_id);
   void updateKeyframeTimestamp(int keyframe_id);
   void updateKeyframeLabel(int property_index);
+  void deleteKeyframe(int property_index);
+  void previewKeyframes();
 
 private:
   Ogre::SceneNode* createNode( const Ogre::Vector3& position, const Ogre::Quaternion& orientation );
@@ -55,6 +57,7 @@ private:
   rviz::Property* keyframes_property_;
   rviz::StringProperty* topic_property_;
   rviz::BoolProperty* publish_property_;
+  rviz::BoolProperty* preview_property_;
   static int current_keyframe_id;
 };
 

@@ -9,6 +9,7 @@
 
 #include <rviz/viewport_mouse_event.h>
 #include <rviz/visualization_manager.h>
+#include <rviz/view_manager.h>
 #include <rviz/mesh_loader.h>
 #include <rviz/geometry.h>
 #include <rviz/properties/property.h>
@@ -51,11 +52,16 @@ void KeyframeTool::onInitialize()
 
   keyframes_property_ = new rviz::Property("Keyframes");
   topic_property_ = new rviz::StringProperty("Topic", "/operator_keyframes");
-  publish_property_ = new rviz::BoolProperty("Publish?");
+  publish_property_ = new rviz::BoolProperty("Publish?", false);
+  preview_property_ = new rviz::BoolProperty("Preview?", false);
 
-  getPropertyContainer()->addChild( keyframes_property_ );
   getPropertyContainer()->addChild( topic_property_ );
+  getPropertyContainer()->addChild( preview_property_ );
   getPropertyContainer()->addChild( publish_property_ );
+  getPropertyContainer()->addChild( keyframes_property_ );
+
+  connect(preview_property_, &rviz::BoolProperty::changed, this, &KeyframeTool::previewKeyframes);
+
 }
 
 void KeyframeTool::activate() {}
@@ -71,31 +77,22 @@ int KeyframeTool::processMouseEvent( rviz::ViewportMouseEvent& event )
   current_keyframe_id++;
 
   rviz::Property* keyframe_property = new rviz::Property("Keyframe " + QString::number(keyframes_property_->numChildren()));
-  rviz::VectorProperty* keyframe_position_property = new rviz::VectorProperty("Position");
-  rviz::QuaternionProperty* keyframe_orientation_property = new rviz::QuaternionProperty("Orientation");
-  rviz::FloatProperty* keyframe_timestamp_property = new rviz::FloatProperty("Timestamp");
-  rviz::StringProperty* keyframe_label_property = new rviz::StringProperty("Label");
-  rviz::IntProperty* keyframe_id_property = new rviz::IntProperty("ID");
-
-  keyframe_position_property ->setVector(keyframe.position_);
-  keyframe_orientation_property->setQuaternion(keyframe.orientation_);
-  keyframe_timestamp_property->setFloat(keyframe.timestamp_);
-  keyframe_label_property->setStdString(keyframe.label_);
-  keyframe_id_property->setInt(keyframe.id_);
+  rviz::BoolProperty* keyframe_active_property = new rviz::BoolProperty("Active?", true, "", keyframe_property);
+  rviz::IntProperty* keyframe_id_property = new rviz::IntProperty("ID", keyframe.id_, "", keyframe_property);
+  rviz::StringProperty* keyframe_label_property = new rviz::StringProperty("Label", QString::fromStdString(keyframe.label_), "", keyframe_property);
+  rviz::VectorProperty* keyframe_position_property = new rviz::VectorProperty("Position", keyframe.position_, "", keyframe_property);
+  rviz::QuaternionProperty* keyframe_orientation_property = new rviz::QuaternionProperty("Orientation", keyframe.orientation_, "", keyframe_property);
+  rviz::FloatProperty* keyframe_timestamp_property = new rviz::FloatProperty("Timestamp", keyframe.timestamp_, "", keyframe_property);
 
   int property_index = keyframes_property_->numChildren();
   connect(keyframe_position_property, &rviz::VectorProperty::changed, this, [=](){ updateKeyframePosition(property_index); });
   connect(keyframe_orientation_property, &rviz::QuaternionProperty::changed, this, [=](){ updateKeyframeOrientation(property_index); });
   connect(keyframe_timestamp_property, &rviz::FloatProperty::changed, this, [=](){ updateKeyframeTimestamp(property_index); });
   connect(keyframe_label_property, &rviz::StringProperty::changed, this, [=](){ updateKeyframeLabel(property_index); });
-  keyframe_id_property->setReadOnly(true);
+  connect(keyframe_active_property, &rviz::BoolProperty::changed, this, [=](){ deleteKeyframe(property_index); });
 
+  keyframe_id_property->setReadOnly(true);
   keyframes_property_->addChild( keyframe_property );
-  keyframe_property->addChild( keyframe_id_property );
-  keyframe_property->addChild( keyframe_label_property );
-  keyframe_property->addChild( keyframe_position_property );
-  keyframe_property->addChild( keyframe_orientation_property );
-  keyframe_property->addChild( keyframe_timestamp_property );
 
   return Render | Finished;
 }
@@ -106,32 +103,31 @@ void KeyframeTool::save( rviz::Config config ) const
   rviz::Config keyframe_tool_config = config.mapMakeChild( "Keyframe Tool" );
   rviz::Config keyframe_topic_config = keyframe_tool_config.mapMakeChild("Topic");
   topic_property_->save( keyframe_topic_config );
+  
+  keyframe_tool_config.mapSetValue("current_keyframe_id", current_keyframe_id);
 
   rviz::Config keyframes_config = keyframe_tool_config.mapMakeChild( "Keyframes" );
 
-  for (auto keyframe : keyframes_) {
+  int num_children = keyframes_property_->numChildren();
+  for( int i = 0; i < num_children; i++ )
+  {
+    rviz::Property* keyframe_prop = keyframes_property_->childAt( i );
+    rviz::Config keyframe_config = keyframes_config.listAppendNew();
 
+    keyframe_config.mapSetValue( "Name", keyframe_prop->getName() );
+    for (int j = 0; j < keyframe_prop->numChildren(); j++) {
+      rviz::Property* keyframe_aspect_prop = keyframe_prop->childAt(j);
+      rviz::Config keyframe_aspect_config = keyframe_config.mapMakeChild(keyframe_aspect_prop->getName());
+      keyframe_aspect_prop->save( keyframe_aspect_config );
+    }
   }
-
-  // int num_children = keyframes_property_->numChildren();
-  // for( int i = 0; i < num_children; i++ )
-  // {
-  //   rviz::Property* keyframe_prop = keyframes_property_->childAt( i );
-  //   rviz::Config keyframe_config = keyframes_config.listAppendNew();
-
-  //   keyframe_config.mapSetValue( "Name", keyframe_prop->getName() );
-  //   for (int j = 0; j < keyframe_prop->numChildren(); j++) {
-  //     rviz::Property* keyframe_aspect_prop = keyframe_prop->childAt(j);
-  //     rviz::Config keyframe_aspect_config = keyframe_config.mapMakeChild(keyframe_aspect_prop->getName());
-  //     keyframe_aspect_prop->save( keyframe_aspect_config );
-  //   }
-  // }
 }
 
 void KeyframeTool::load( const rviz::Config& config )
 {
   rviz::Config keyframe_tool_config = config.mapGetChild( "Keyframe Tool" );
   rviz::Config keyframe_topic_config = keyframe_tool_config.mapGetChild("Topic");
+  keyframe_tool_config.mapGetInt("current_keyframe_id", &current_keyframe_id);
 
   topic_property_->load(keyframe_topic_config);
   
@@ -148,18 +144,36 @@ void KeyframeTool::load( const rviz::Config& config )
     rviz::VectorProperty* keyframe_position_property = new rviz::VectorProperty("Position");
     rviz::QuaternionProperty* keyframe_orientation_property = new rviz::QuaternionProperty("Orientation");
     rviz::FloatProperty* keyframe_timestamp_property = new rviz::FloatProperty("Timestamp");
+    rviz::StringProperty* keyframe_label_property = new rviz::StringProperty("Label");
+    rviz::IntProperty* keyframe_id_property = new rviz::IntProperty("ID");
+    rviz::BoolProperty* keyframe_active_property = new rviz::BoolProperty("Active?", true);
+    
 
     keyframe_position_property->load( keyframe_config.mapGetChild("Position") );
     keyframe_orientation_property->load( keyframe_config.mapGetChild("Orientation") );
     keyframe_timestamp_property->load( keyframe_config.mapGetChild("Timestamp") );
+    keyframe_label_property->load( keyframe_config.mapGetChild("Label") );
+    keyframe_id_property->load( keyframe_config.mapGetChild("ID") );
 
+    int property_index = keyframes_property_->numChildren();
+    connect(keyframe_position_property, &rviz::VectorProperty::changed, this, [=](){ updateKeyframePosition(property_index); });
+    connect(keyframe_orientation_property, &rviz::QuaternionProperty::changed, this, [=](){ updateKeyframeOrientation(property_index); });
+    connect(keyframe_timestamp_property, &rviz::FloatProperty::changed, this, [=](){ updateKeyframeTimestamp(property_index); });
+    connect(keyframe_label_property, &rviz::StringProperty::changed, this, [=](){ updateKeyframeLabel(property_index); });
+    connect(keyframe_active_property, &rviz::BoolProperty::changed, this, [=](){ deleteKeyframe(property_index); });    
+
+    keyframe_property->addChild( keyframe_active_property );
+    keyframe_property->addChild( keyframe_id_property );
+    keyframe_property->addChild( keyframe_label_property );
     keyframe_property->addChild( keyframe_position_property );
     keyframe_property->addChild( keyframe_orientation_property );
     keyframe_property->addChild( keyframe_timestamp_property );
     keyframes_property_->addChild( keyframe_property );
 
     auto node = createNode( keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion() );
-    // keyframes_.push_back(Keyframe{node, keyframe_timestamp_property->getFloat(), current_keyframe_id++, current_keyframe_id});
+    auto keyframe = Keyframe{node, keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion(),
+                              keyframe_timestamp_property->getFloat(), keyframe_id_property->getInt(), keyframe_label_property->getStdString()};
+    keyframes_.push_back(keyframe);
   }
 }
 
@@ -179,8 +193,19 @@ void KeyframeTool::renderKeyframeProperties() {
     dynamic_cast<rviz::FloatProperty*>(keyframe_property->subProp("Timestamp"))->setFloat(keyframe.timestamp_);
     dynamic_cast<rviz::StringProperty*>(keyframe_property->subProp("Label"))->setStdString(keyframe.label_);
     dynamic_cast<rviz::IntProperty*>(keyframe_property->subProp("ID"))->setInt(keyframe.id_);
-
+    dynamic_cast<rviz::BoolProperty*>(keyframe_property->subProp("Active?"))->setBool(true);
   }
+}
+
+void KeyframeTool::previewKeyframes() {
+  if (!preview_property_->getBool()) return;
+  context_->getViewManager()->setCurrentViewControllerType("rviz/FPS");
+  auto view_controller = context_->getViewManager()->getCurrent();
+  auto keyframe = keyframes_[0];
+  view_controller->subProp("Position")->subProp("X")->setValue(keyframe.position_[0]);
+  view_controller->subProp("Position")->subProp("Y")->setValue(keyframe.position_[1]);
+  view_controller->subProp("Position")->subProp("Z")->setValue(keyframe.position_[2]);
+
 }
 
 void KeyframeTool::updateKeyframePosition(int property_index)
@@ -209,6 +234,15 @@ void KeyframeTool::updateKeyframeLabel(int property_index)
 {
   auto& keyframe = keyframes_[property_index];
   keyframe.label_ = dynamic_cast<rviz::StringProperty*>(keyframes_property_->childAt(property_index)->subProp("Label"))->getStdString();
+}
+
+void KeyframeTool::deleteKeyframe(int property_index) {
+  if (keyframes_property_->childAt(property_index)->subProp("Active?")->getValue().toBool()) return;
+  auto& keyframe = keyframes_[property_index];
+  scene_manager_->destroySceneNode(keyframe.node_);
+  keyframes_.erase(keyframes_.begin() + property_index);
+  keyframes_property_->removeChildren(keyframes_property_->numChildren() - 1, 1);
+  renderKeyframeProperties();
 }
 
 Ogre::SceneNode* KeyframeTool::createNode( const Ogre::Vector3& position, const Ogre::Quaternion& orientation )
