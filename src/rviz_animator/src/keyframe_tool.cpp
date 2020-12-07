@@ -6,6 +6,7 @@
 #include <OGRE/OgreEntity.h>
 
 #include <ros/console.h>
+#include <ros/ros.h>
 
 #include <rviz/viewport_mouse_event.h>
 #include <rviz/visualization_manager.h>
@@ -21,6 +22,8 @@
 #include <rviz/properties/int_property.h>
 
 #include "keyframe_tool.h"
+#include "rviz_animator/KeyframeMsg.h"
+#include "rviz_animator/KeyframesMsg.h"
 
 namespace rviz_animator
 {
@@ -29,7 +32,9 @@ int KeyframeTool::current_keyframe_id = 0;
 
 KeyframeTool::KeyframeTool()
 {
+  ros::NodeHandle nh;
   shortcut_key_ = 'k';
+  pub_ = nh.advertise<KeyframesMsg>("/operator_keyframes", 1);
 }
 
 KeyframeTool::~KeyframeTool()
@@ -61,6 +66,7 @@ void KeyframeTool::onInitialize()
   getPropertyContainer()->addChild( keyframes_property_ );
 
   connect(preview_property_, &rviz::BoolProperty::changed, this, &KeyframeTool::previewKeyframes);
+  connect(publish_property_, &rviz::BoolProperty::changed, this, &KeyframeTool::publishKeyframes);
 
 }
 
@@ -72,7 +78,7 @@ int KeyframeTool::processMouseEvent( rviz::ViewportMouseEvent& event )
 {
   Ogre::Camera* camera = scene_manager_->getCurrentViewport()->getCamera();
   auto node = createNode(camera->getPosition(), camera->getOrientation());
-  auto keyframe = Keyframe{node, camera->getPosition(), camera->getOrientation(), 0, current_keyframe_id, "keyframe_id_" + std::to_string(current_keyframe_id)};
+  auto keyframe = KeyframeStruct{node, camera->getPosition(), camera->getOrientation(), 0, current_keyframe_id, "keyframe_id_" + std::to_string(current_keyframe_id)};
   keyframes_.push_back(keyframe);
   current_keyframe_id++;
 
@@ -171,7 +177,7 @@ void KeyframeTool::load( const rviz::Config& config )
     keyframes_property_->addChild( keyframe_property );
 
     auto node = createNode( keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion() );
-    auto keyframe = Keyframe{node, keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion(),
+    auto keyframe = KeyframeStruct{node, keyframe_position_property->getVector(), keyframe_orientation_property->getQuaternion(),
                               keyframe_timestamp_property->getFloat(), keyframe_id_property->getInt(), keyframe_label_property->getStdString()};
     keyframes_.push_back(keyframe);
   }
@@ -206,6 +212,27 @@ void KeyframeTool::previewKeyframes() {
   view_controller->subProp("Position")->subProp("Y")->setValue(keyframe.position_[1]);
   view_controller->subProp("Position")->subProp("Z")->setValue(keyframe.position_[2]);
 
+}
+
+void KeyframeTool::publishKeyframes() {
+  if (!publish_property_->getBool()) return;
+  KeyframesMsg keyframes_msg;
+  keyframes_msg.keyframes.clear();
+  keyframes_msg.num_keyframes = keyframes_.size();
+  for (int i = 0; i < keyframes_.size(); ++i) {
+    KeyframeStruct keyframe = keyframes_[i];
+    KeyframeMsg keyframe_msg;
+    keyframe_msg.frame.position.x = keyframe.position_[0];
+    keyframe_msg.frame.position.y = keyframe.position_[1];
+    keyframe_msg.frame.position.z = keyframe.position_[2];
+    keyframe_msg.frame.orientation.x = keyframe.orientation_[0];
+    keyframe_msg.frame.orientation.y = keyframe.orientation_[1];
+    keyframe_msg.frame.orientation.z = keyframe.orientation_[2];
+    keyframe_msg.frame.orientation.w = keyframe.orientation_[3];
+    keyframe_msg.timestamp = keyframe.timestamp_;
+    keyframes_msg.keyframes.push_back(keyframe_msg);
+  }
+  pub_.publish(keyframes_msg);
 }
 
 void KeyframeTool::updateKeyframePosition(int property_index)

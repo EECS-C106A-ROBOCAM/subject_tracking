@@ -1,6 +1,8 @@
 #ifndef KEYFRAME_TOOL_H
 #define KEYFRAME_TOOL_H
 
+#include <ros/ros.h>
+
 #include <rviz/tool.h>
 #include <rviz/properties/string_property.h>
 #include <rviz/properties/bool_property.h>
@@ -12,14 +14,14 @@
 namespace rviz_animator
 {
 
-struct Keyframe {
+struct KeyframeStruct {
   Ogre::SceneNode* node_;
   Ogre::Vector3 position_;
   Ogre::Quaternion orientation_;
   float timestamp_;
   int id_;
   std::string label_;
-  bool operator< (const Keyframe& other) {return timestamp_ < other.timestamp_;}
+  bool operator< (const KeyframeStruct& other) {return timestamp_ < other.timestamp_;}
 };
 
 class KeyframeTool: public rviz::Tool
@@ -46,13 +48,15 @@ private Q_SLOTS:
   void updateKeyframeLabel(int property_index);
   void deleteKeyframe(int property_index);
   void previewKeyframes();
+  void publishKeyframes();
 
 private:
   Ogre::SceneNode* createNode( const Ogre::Vector3& position, const Ogre::Quaternion& orientation );
   void sortKeyframes();
   void renderKeyframeProperties();
-
-  std::vector<Keyframe> keyframes_;
+  
+  ros::Publisher pub_;
+  std::vector<KeyframeStruct> keyframes_;
   std::string keyframe_resource_;
   rviz::Property* keyframes_property_;
   rviz::StringProperty* topic_property_;

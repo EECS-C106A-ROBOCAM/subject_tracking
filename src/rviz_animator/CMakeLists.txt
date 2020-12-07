@@ -1,12 +1,26 @@
 ## BEGIN_TUTORIAL
-## This CMakeLists.txt file for rviz_animator builds both the
+## This CMakeLists.txt file for rviz_plugin_tutorials builds both the
 ## TeleopPanel tutorial and the ImuDisplay tutorial.
 ##
 ## First start with some standard catkin stuff.
 cmake_minimum_required(VERSION 3.0.2)
 project(rviz_animator)
-find_package(catkin REQUIRED COMPONENTS rviz)
-catkin_package()
+find_package(catkin REQUIRED COMPONENTS rviz message_generation roscpp rospy std_msgs geometry_msgs)
+
+add_message_files(
+  FILES
+  KeyframeMsg.msg
+  KeyframesMsg.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
+
+catkin_package(CATKIN_DEPENDS message_runtime)
+
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
@@ -39,7 +53,7 @@ set(SRC_FILES
 
 ## An rviz plugin is just a shared library, so here we declare the
 ## library to be called ``${PROJECT_NAME}`` (which is
-## "rviz_animator", or whatever your version of this project
+## "rviz_plugin_tutorials", or whatever your version of this project
 ## is called) and specify the list of source files we collected above
 ## in ``${SRC_FILES}``.
 add_library(${PROJECT_NAME} ${SRC_FILES})
@@ -49,10 +63,10 @@ add_library(${PROJECT_NAME} ${SRC_FILES})
 ## ``set(QT_LIBRARIES Qt5::Widgets)``, and with whatever libraries
 ## catkin has included.
 ##
-## Although this puts "rviz_animator" (or whatever you have
+## Although this puts "rviz_plugin_tutorials" (or whatever you have
 ## called the project) as the name of the library, cmake knows it is a
 ## library and names the actual file something like
-## "librviz_animator.so", or whatever is appropriate for your
+## "librviz_plugin_tutorials.so", or whatever is appropriate for your
 ## particular OS.
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
 ## END_TUTORIAL
