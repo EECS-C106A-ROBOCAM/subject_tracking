@@ -20,6 +20,8 @@ from geometry_msgs.msg import (
     Transform
 )
 
+from ik_solver import IKSolver
+
 def createSequence(keyframes, dt=0.1):
     timestamps = [frame.timestamp for frame in keyframes]
     rotations = quaternion.as_quat_array([[frame.frame.orientation.x, frame.frame.orientation.y, frame.frame.orientation.z, frame.frame.orientation.w] for frame in keyframes])
@@ -50,6 +52,8 @@ def callback(message):
     tf_buffer = tf2_ros.Buffer(rospy.Duration(1200))
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
+    solver = IKSolver('left_arm')
+
     print("Acquiring reference frames...")
     transform_object_to_base = None
     while not transform_object_to_base:
@@ -71,9 +75,16 @@ def callback(message):
             continue
 
         target_pose = do_transform_pose(pose, transform_object_to_base)
-        pub.publish(target_pose)
+        print("about to publish poses")
         # do ik and get joint angles
-
+        # target_pose.pose.position.x, target_pose.pose.position.y, target_pose.pose.position.z = 0.75, 0, 0.38
+        # target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w = 0, -1, 0, 0
+        # joint_angles = solver.get_ik_solution(target_pose)
+        test_pose = PoseStamped()
+        test_pose.pose.position.x, test_pose.pose.position.y, test_pose.pose.position.z = target_pose.pose.position.x, target_pose.pose.position.y, target_pose.pose.position.z
+        test_pose.pose.orientation.x, test_pose.pose.orientation.y, test_pose.pose.orientation.z, test_pose.pose.orientation.w = 0, 1, 0, 0
+        solver.go(test_pose.pose)
+        pub.publish(test_pose)
         # send to arduino
     print("Finished playback...")
 

@@ -96,7 +96,9 @@ def simulate_movement(reference_frame="world", max_speed=1):
             curr_state = get_ball("ball", reference_frame)
             next_state = ModelState("ball", curr_state.pose, twist, reference_frame)
             move_resp = move_ball(next_state) 
-            register_frame(curr_state.pose)
+            pose = Pose()
+            pose.position.x, pose.position.y, pose.position.z = 0.18, 0.44, -0.55
+            register_frame(pose)
             rate.sleep()
 
     except rospy.ROSInterruptException, e:
@@ -111,7 +113,7 @@ def main():
     rospy.on_shutdown(delete_gazebo_models)
 
     print("Running simulation")
-    simulate_movement(max_speed=10)
+    simulate_movement(max_speed=3)
 
 if __name__ == '__main__':
     tf2Broadcast = tf2_ros.TransformBroadcaster()

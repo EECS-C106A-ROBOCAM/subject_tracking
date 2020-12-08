@@ -47,6 +47,7 @@ KeyframeTool::~KeyframeTool()
 
 void KeyframeTool::onInitialize()
 {
+  // keyframe_resource_ = "package://rviz_animator/media/camera.dae";
   keyframe_resource_ = "package://rviz_plugin_tutorials/media/flag.dae";
 
   if( rviz::loadMeshFromResource( keyframe_resource_ ).isNull() )
