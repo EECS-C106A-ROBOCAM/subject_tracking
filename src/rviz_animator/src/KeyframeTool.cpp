@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
@@ -21,9 +22,12 @@
 #include <rviz/properties/float_property.h>
 #include <rviz/properties/int_property.h>
 
-#include "keyframe_tool.h"
 #include "rviz_animator/KeyframeMsg.h"
 #include "rviz_animator/KeyframesMsg.h"
+
+#include "AnimationViewController.h"
+
+#include "KeyframeTool.h"
 
 namespace rviz_animator
 {
@@ -205,13 +209,13 @@ void KeyframeTool::renderKeyframeProperties() {
 
 void KeyframeTool::previewKeyframes() {
   if (!preview_property_->getBool()) return;
-  context_->getViewManager()->setCurrentViewControllerType("rviz/FPS");
-  auto view_controller = context_->getViewManager()->getCurrent();
-  auto keyframe = keyframes_[0];
-  view_controller->subProp("Position")->subProp("X")->setValue(keyframe.position_[0]);
-  view_controller->subProp("Position")->subProp("Y")->setValue(keyframe.position_[1]);
-  view_controller->subProp("Position")->subProp("Z")->setValue(keyframe.position_[2]);
-
+  std::cout << "property true" << std::endl;
+  auto view_controller = new AnimationViewController();
+  std::cout << "avc created" << std::endl;
+  view_controller->setPose(keyframes_[0].position_, keyframes_[0].orientation_);
+  std::cout << "pose set" << std::endl;
+  context_->getViewManager()->setCurrentFrom(view_controller);
+  std::cout << "current view controller changed" << std::endl;
 }
 
 void KeyframeTool::publishKeyframes() {
