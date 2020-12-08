@@ -2,6 +2,7 @@
 
 import rospy
 import rospkg
+import tf2_ros
 
 from gazebo_msgs.msg import ModelState
 
@@ -15,7 +16,8 @@ from gazebo_msgs.srv import (
 from geometry_msgs.msg import (
     Pose,
     Point,
-    Twist
+    Twist,
+    TransformStamped
 )
 
 import numpy as np
@@ -67,6 +69,15 @@ def delete_gazebo_models():
     except rospy.ServiceException, e:
         print("Delete Model service call failed: {0}".format(e))
 
+def register_frame(pose):
+    tf2Stamp = TransformStamped()
+    tf2Stamp.header.stamp = rospy.Time.now()
+    tf2Stamp.header.frame_id = 'world'
+    tf2Stamp.child_frame_id = 'tracked_object'
+    tf2Stamp.transform.translation.x, tf2Stamp.transform.translation.y, tf2Stamp.transform.translation.z = pose.position.x, pose.position.y, pose.position.z
+    tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = 0, 0, 0, 1#pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w
+    tf2Broadcast.sendTransform(tf2Stamp)
+
 def simulate_movement(reference_frame="world", max_speed=1):
     move_ball = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
     get_ball = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
@@ -85,7 +96,7 @@ def simulate_movement(reference_frame="world", max_speed=1):
             curr_state = get_ball("ball", reference_frame)
             next_state = ModelState("ball", curr_state.pose, twist, reference_frame)
             move_resp = move_ball(next_state) 
-
+            register_frame(curr_state.pose)
             rate.sleep()
 
     except rospy.ROSInterruptException, e:
@@ -93,7 +104,6 @@ def simulate_movement(reference_frame="world", max_speed=1):
 
 def main():
     rospy.init_node("movement_simulator")
-
     # Load gazebo models for simulation
     load_gazebo_models()
 
@@ -101,7 +111,8 @@ def main():
     rospy.on_shutdown(delete_gazebo_models)
 
     print("Running simulation")
-    simulate_movement()
+    simulate_movement(max_speed=10)
 
 if __name__ == '__main__':
+    tf2Broadcast = tf2_ros.TransformBroadcaster()
     main()
