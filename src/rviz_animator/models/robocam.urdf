@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<robot name="robocam">
+
+    <!-- Robot Links -->
+    <link name="base">
+        <visual>
+            <geometry>
+                <cylinder length=".5" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 .25" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <link name="link_rot">
+        <visual>
+            <geometry>
+                <cylinder length=".5" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 .25" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+    
+    <link name="link_1">
+        <visual>
+            <geometry>
+                <cylinder length="2" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 1" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <link name="link_2">
+        <visual>
+            <geometry>
+                <cylinder length="2" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 1" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_pitch">
+        <visual>
+            <geometry>
+                <cylinder length=".5" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 .25" rpy="0 0 0" />
+        </visual>
+    </link>
+    
+    <link name="link_yaw">
+        <visual>
+            <geometry>
+                <cylinder length=".5" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 .25" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_roll">
+        <visual>
+            <geometry>
+                <cylinder length=".5" radius="0.2"/>
+            </geometry>
+            <origin xyz="0 0 .25" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <!-- Robot Joints -->
+    <joint name="joint_base_rot" type="continuous">
+        <parent link="base"/>
+        <child link="link_rot"/>
+        <origin xyz="0 0 .5" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+  
+    <joint name="joint_rot_1" type="continuous">
+        <parent link="link_rot"/>
+        <child link="link_1"/>
+        <origin xyz="0 0 .5" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="joint_1_2" type="continuous">
+        <parent link="link_1"/>
+        <child link="link_2"/>
+        <origin xyz="0 0 2" rpy="-1.57 0 0" />
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="joint_2_pitch" type="continuous">
+        <parent link="link_2"/>
+        <child link="link_pitch"/>
+        <origin xyz="0 0 2" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="joint_pitch_yaw" type="continuous">
+        <parent link="link_pitch"/>
+        <child link="link_yaw"/>
+        <origin xyz="0 0 .5" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <joint name="joint_yaw_roll" type="continuous">
+        <parent link="link_yaw"/>
+        <child link="link_roll"/>
+        <origin xyz="0 0 .5" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+</robot>
+
