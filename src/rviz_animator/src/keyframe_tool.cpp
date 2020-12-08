@@ -61,7 +61,7 @@ void KeyframeTool::onInitialize()
   preview_property_ = new rviz::BoolProperty("Preview?", false);
 
   getPropertyContainer()->addChild( topic_property_ );
-  getPropertyContainer()->addChild( preview_property_ );
+  // getPropertyContainer()->addChild( preview_property_ ); // TODO(JS): Fix
   getPropertyContainer()->addChild( publish_property_ );
   getPropertyContainer()->addChild( keyframes_property_ );
 
