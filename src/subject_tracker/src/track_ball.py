@@ -41,22 +41,23 @@ class BallTracker:
         # TODO(JS): tune the bounds on the Hough parameters
         
         if circles is not None:
-            circles = np.uint16(np.around(circles))
+            circles = np.uint16(np.around(circles))[0]
 
-            target = circles[0][0]
+            target = circles[0]
             print(target)
             center = (target[0], target[1])
             radius = target[2]
 
-            x_adj = center[0] - image.shape[0]
-            y_adj = center[1] - image.shape[1]
+            x_adj = (center[0] - image.shape[0]) / BallTracker.FOCAL_LENGTH
+            y_adj = (center[1] - image.shape[1]) / BallTracker.FOCAL_LENGTH
             z_adj = (radius - BallTracker.TARGET_RADIUS) / BallTracker.FOCAL_LENGTH
+            print("X adj: {0}\tY adj: {1}\tZ adj: {2}".format(x_adj, y_adj, z_adj))
 
-            # cv2.circle(image, center, 1, (100, 0, 100), 3)
-            # cv2.circle(image, center, radius, (0, 255, 255), 3)
+            cv2.circle(image, center, 1, (100, 0, 100), 3)
+            cv2.circle(image, center, radius, (0, 255, 255), 3)
 
             # Also draw all circles
-            for i in circles[0, :]:
+            for i in circles[1:]:
                 center = (i[0], i[1])
                 # # circle center
                 cv2.circle(image, center, 1, (0, 100, 100), 3)
