@@ -3,7 +3,6 @@
 import rospy
 import sys
 import rospy
-import PyKDL
 import tf2_ros
 import traceback
 import numpy as np
@@ -21,9 +20,6 @@ from geometry_msgs.msg import (
     Transform
 )
 
-# from robocam_sim.src.manipulator_sim.src.path_planner import PathPlanner
-
-# Operator: Major keyframes: [{0, Pose()}, {10, Pose()}, {60, Pose()}]
 def createSequence(keyframes, dt=0.1):
     timestamps = [frame.timestamp for frame in keyframes]
     rotations = quaternion.as_quat_array([[frame.frame.orientation.x, frame.frame.orientation.y, frame.frame.orientation.z, frame.frame.orientation.w] for frame in keyframes])
@@ -79,6 +75,7 @@ def callback(message):
         # do ik and get joint angles
 
         # send to arduino
+    print("Finished playback...")
 
 def listener():
     print("Listening for keyframes...")
