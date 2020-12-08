@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 
-import rospy
 import sys
+import time
+import PyKDL
 import rospy
 import rospkg
 import tf2_ros
+import warnings
 import traceback
 import numpy as np
 import kdl_parser_py.urdf as parser
-import PyKDL
-# import quaternion
-import time
 
+warnings.filterwarnings('ignore', category=UserWarning)
+import quaternion
 
+from tf_conversions import posemath
 from scipy.interpolate import interp1d
-from tf2_geometry_msgs import do_transform_pose
+
 from rviz_animator.msg import KeyframesMsg
+from tf2_geometry_msgs import do_transform_pose
 from geometry_msgs.msg import (    
 	Point,
 	Quaternion,
@@ -51,10 +54,22 @@ def createSequence(keyframes, dt=0.1):
 def callback(message):
     time_interps, sequence = createSequence(message.keyframes)
 
+
+    print("Setting up kinematics solvers..")
+    rospkg.RosPack().get_path('rviz_animator')
+    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.urdf")
+    chain = tree.getChain("base", "link_roll")
+    current_joints = PyKDL.JntArray(chain.getNrOfJoints())
+    PyKDL.SetToZero(current_joints)
+    
+    fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
+    ik_vel_solver = PyKDL.ChainIkSolverVel_pinv(chain)
+    ik_solver = PyKDL.ChainIkSolverPos_NR(chain, fk_solver, ik_vel_solver)
+
+    print("Getting reference frames...")
     tf_buffer = tf2_ros.Buffer(rospy.Duration(1200))
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
-    print("Acquiring reference frames...")
     transform_object_to_base = None
     while not transform_object_to_base:
         try:
@@ -75,11 +90,25 @@ def callback(message):
             continue
 
         target_pose = do_transform_pose(pose, transform_object_to_base)
-        pub.publish(target_pose)
-        # do ik and get joint angles
+        target_frame = posemath.fromMsg(target_pose.pose)
 
+        target_joints = PyKDL.JntArray(chain.getNrOfJoints())
+        success = ik_solver.CartToJnt(current_joints, target_frame, target_joints)
+
+        if success != 0:
+            print("IK Solver Failed. Status: {}".format(success))
+        else:
+            print("FK Correctness Test:")
+            output_frame = PyKDL.Frame()
+            success = fk_solver.JntToCart(target_joints, output_frame)
+    
+            print("Requested frame:\n{}".format(posemath.toMsg(target_frame)))
+            print("Returned frame:\n{}".format(posemath.toMsg(output_frame)))
+
+        pub.publish(target_pose)
         # send to arduino
-    print("Finished playback...")
+
+    print("Finished playback.")
 
 def listener():
     print("Listening for keyframes...")
@@ -93,45 +122,5 @@ def listener():
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
     pub = rospy.Publisher('rviz_poses', PoseStamped, queue_size=10)
-
-    rospkg.RosPack().get_path('rviz_animator')
-    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.urdf")
-    chain = tree.getChain("base", "link_roll")
-    current_joints = PyKDL.JntArray(chain.getNrOfJoints())
-    PyKDL.SetToZero(current_joints)
-    
-    fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
-    ik_vel_solver = PyKDL.ChainIkSolverVel_pinv(chain)
-    ik_solver = PyKDL.ChainIkSolverPos_NR(chain, fk_solver, ik_vel_solver)
-
-    print("Solvers ready")
-
-    # output_frame = PyKDL.Frame()
-    # success = fk_solver.JntToCart(current_joints, output_frame)
-    # # print("FK Solver Status: {}".format(success))
-    # # print(output_frame)
-
-    # velocity_twist = PyKDL.Twist(PyKDL.Vector(1, 1, 1), PyKDL.Vector())
-    # output_joints = PyKDL.JntArray(chain.getNrOfJoints())
-    # success = ik_vel_solver.CartToJnt(current_joints, velocity_twist, output_joints)
-    # print("IK Vel Solver Status: {}".format(success))
-    # print(output_joints)
-
-
-    # Modify this for testing various frames
-    goal_frame = PyKDL.Frame(PyKDL.Rotation(1, 0, 0, 0, 1, 0, 0, 0, 1), PyKDL.Vector(3, 1, 1))
-
-
-    goal_joints = PyKDL.JntArray(chain.getNrOfJoints())
-    success = ik_solver.CartToJnt(current_joints, goal_frame, goal_joints)
-    print("IK Solver Status: {}".format(success))
-    # print(goal_joints)
-
-    print("Test: does FK get us the goal pose back?")
-    output_frame = PyKDL.Frame()
-    success = fk_solver.JntToCart(goal_joints, output_frame)
-    print("Requested frame:\n{}".format(goal_frame))
-    print("Returned frame:\n{}".format(output_frame))
-
 
     listener()

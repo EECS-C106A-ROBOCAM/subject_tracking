@@ -111,7 +111,7 @@ def main():
     rospy.on_shutdown(delete_gazebo_models)
 
     print("Running simulation")
-    simulate_movement(max_speed=10)
+    simulate_movement(max_speed=3)
 
 if __name__ == '__main__':
     tf2Broadcast = tf2_ros.TransformBroadcaster()

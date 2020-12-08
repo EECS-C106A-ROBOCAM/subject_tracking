@@ -6,7 +6,10 @@
 Clone this repository into your `ros_workspaces`, and `cd` into the root directory of the cloned repository.
 
 KDL install:
-`sudo apt-get install ros-kinetic-orocos-kdl`
+`sudo apt-get install ros-kinetic-orocos-kdl` and `sudo apt-get install ros-kinetic-kdl-parser-py`.
+
+Quaternion install:
+`python -m pip install numpy-quaternion`
 
 ### Running Simulation
 To load Baxter into Gazebo, run `/baxter.sh sim` followed by `roslaunch baxter_gazebo baxter_world.launch right_electric_gripper:=false left_electric_gripper:=false`. 
