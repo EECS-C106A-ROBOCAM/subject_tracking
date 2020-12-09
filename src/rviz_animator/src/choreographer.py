@@ -30,6 +30,10 @@ from sensor_msgs.msg import (
     JointState
 )
 
+from ik_solver.srv import (
+    SolveIK
+)
+
 def createSequence(keyframes, dt=0.1):
     timestamps = [frame.timestamp for frame in keyframes]
     rotations = quaternion.as_quat_array([[frame.frame.orientation.x, frame.frame.orientation.y, frame.frame.orientation.z, frame.frame.orientation.w] for frame in keyframes])
@@ -55,19 +59,7 @@ def createSequence(keyframes, dt=0.1):
     return time_interps, sequence 
 
 def callback(message):
-    time_interps, sequence = createSequence(message.keyframes)
-
-
-    print("Setting up kinematics solvers..")
-    rospkg.RosPack().get_path('rviz_animator')
-    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.xml")
-    chain = tree.getChain("base", "link_roll")
-    current_joints = PyKDL.JntArray(chain.getNrOfJoints())
-    PyKDL.SetToZero(current_joints)
-    
-    fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
-    ik_vel_solver = PyKDL.ChainIkSolverVel_pinv(chain)
-    ik_solver = PyKDL.ChainIkSolverPos_NR(chain, fk_solver, ik_vel_solver)
+    time_interps, sequence = createSequence(message.keyframes)    
 
     print("Getting reference frames...")
     tf_buffer = tf2_ros.Buffer(rospy.Duration(1200))
@@ -76,12 +68,17 @@ def callback(message):
     transform_object_to_base = None
     while not transform_object_to_base:
         try:
-            transform_object_to_base = tf_buffer.lookup_transform('world', 'tracked_object', rospy.Time(0))
+            transform_object_to_base = tf_buffer.lookup_transform('base', 'tracked_object', rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             continue
     
     print("Beginning playback...")
     start = time.time()
+    target_joints = None
+    current_joints = JointState()
+    current_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+    current_joints.header.stamp = rospy.Time.now()
+    current_joints.position = [0.1] * 6
     for t, pose in zip(time_interps, sequence):
         while time.time() - start < t:
             continue
@@ -93,20 +90,21 @@ def callback(message):
             continue
 
         target_pose = do_transform_pose(pose, transform_object_to_base)
-        target_frame = posemath.fromMsg(target_pose.pose)
+        try:
+            solve_ik = rospy.ServiceProxy('solve_ik', SolveIK)
+            response = solve_ik(target_pose, current_joints)
+            target_joints = response.output_joints
+            current_joints = target_joints
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
-        target_joints = PyKDL.JntArray(chain.getNrOfJoints())
-        success = ik_solver.CartToJnt(current_joints, target_frame, target_joints)
-
-        if success != 0:
-            print("IK Solver Failed. Status: {}".format(success))
- 
-        target_state = JointState()
-        target_state.header.stamp = rospy.Time.now()
-        target_state.position = list(target_joints)
-        target_state.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
-
-        pub_robot.publish(target_state)
+        if target_joints is not None:
+            publish_joints = JointState()
+            publish_joints.position = target_joints.position
+            publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+            publish_joints.header.stamp = rospy.Time.now()
+            pub_robot.publish(publish_joints)
+            
         pub.publish(target_pose)
 
     print("Finished playback.")
@@ -115,6 +113,8 @@ if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
     pub = rospy.Publisher('rviz_poses', PoseStamped, queue_size=10)
     pub_robot = rospy.Publisher('joint_states', JointState, queue_size=10)
+    print("Waiting for IK service...")
+    rospy.wait_for_service('solve_ik')
 
     print("Listening for keyframes...")
     rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
