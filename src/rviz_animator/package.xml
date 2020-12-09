@@ -4,7 +4,7 @@
   <description>
      Tutorials showing how to write plugins for RViz.
   </description>
-  <maintainer email="bob@openrobotics.org">bob</maintainer>
+  <maintainer email="ayush.jain@berkeley.edu">Ayush Jain, Hater of Life, Eater of Foods</maintainer>
   <license>BSD</license>
 
   <url>http://ros.org/wiki/rviz_plugin_tutorials</url>
@@ -16,8 +16,10 @@
   <build_depend>rviz</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>kdl_parser</build_depend>
-  
+  <build_depend>trac_ik_lib</build_depend>
+
   <run_depend>kdl_parser</run_depend>
+  <run_depend>trac_ik_lib</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>libqt5-core</run_depend>
   <run_depend>libqt5-gui</run_depend>

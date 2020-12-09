@@ -225,10 +225,10 @@ void KeyframeTool::publishKeyframes() {
     keyframe_msg.frame.position.x = keyframe.position_[0];
     keyframe_msg.frame.position.y = keyframe.position_[1];
     keyframe_msg.frame.position.z = keyframe.position_[2];
-    keyframe_msg.frame.orientation.x = keyframe.orientation_[0];
-    keyframe_msg.frame.orientation.y = keyframe.orientation_[1];
-    keyframe_msg.frame.orientation.z = keyframe.orientation_[2];
-    keyframe_msg.frame.orientation.w = keyframe.orientation_[3];
+    keyframe_msg.frame.orientation.w = keyframe.orientation_[0];
+    keyframe_msg.frame.orientation.x = keyframe.orientation_[1];
+    keyframe_msg.frame.orientation.y = keyframe.orientation_[2];
+    keyframe_msg.frame.orientation.z = keyframe.orientation_[3];
     keyframe_msg.timestamp = keyframe.timestamp_;
     keyframes_msg.keyframes.push_back(keyframe_msg);
   }

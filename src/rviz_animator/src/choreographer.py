@@ -2,6 +2,7 @@
 
 import sys
 import time
+import math
 import PyKDL
 import rospy
 import rospkg
@@ -15,6 +16,7 @@ warnings.filterwarnings('ignore', category=UserWarning)
 import quaternion
 
 from tf_conversions import posemath
+from urdf_parser_py.urdf import URDF
 from scipy.interpolate import interp1d
 
 from rviz_animator.msg import KeyframesMsg
@@ -64,7 +66,17 @@ def callback(message):
     chain = tree.getChain("base", "link_roll")
     current_joints = PyKDL.JntArray(chain.getNrOfJoints())
     PyKDL.SetToZero(current_joints)
-    
+
+    robot = URDF.from_parameter_server()
+    min_joints, max_joints = PyKDL.JntArray(chain.getNrOfJoints()), PyKDL.JntArray(chain.getNrOfJoints())
+    i = 0
+    for joint in robot.joints:
+        if joint.limit:
+            min_joints[i] = joint.limit.lower
+            max_joints[i] = joint.limit.upper
+            i += 1
+    print(min_joints)
+
     fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
     ik_vel_solver = PyKDL.ChainIkSolverVel_pinv(chain)
     ik_solver = PyKDL.ChainIkSolverPos_NR(chain, fk_solver, ik_vel_solver)
@@ -76,7 +88,7 @@ def callback(message):
     transform_object_to_base = None
     while not transform_object_to_base:
         try:
-            transform_object_to_base = tf_buffer.lookup_transform('world', 'tracked_object', rospy.Time(0))
+            transform_object_to_base = tf_buffer.lookup_transform('base', 'tracked_object', rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             continue
     
@@ -105,6 +117,12 @@ def callback(message):
         target_state.header.stamp = rospy.Time.now()
         target_state.position = list(target_joints)
         target_state.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+        
+        for i in range(len(target_state.position)):
+            if target_state.position[i] < min_joints[i] or target_state.position[i] > max_joints[i]:
+                print("Target joint {} out of bounds. Min: {}. Max: {}. Target {}.".format(target_state.name[i], min_joints[i], max_joints[i], target_state.position[i]))
+            else:
+                print("good")
 
         pub_robot.publish(target_state)
         pub.publish(target_pose)
