@@ -1,0 +1,11 @@
+<launch>
+
+    <param name="robot_description" command="cat $(find rviz_animator)/models/robocam.xml" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 0.25 0 0 0 0 1 world base" />
+
+    <node name="rviz" pkg="rviz" type="rviz" />
+
+</launch>

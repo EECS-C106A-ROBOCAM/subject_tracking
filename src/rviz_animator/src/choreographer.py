@@ -26,6 +26,9 @@ from geometry_msgs.msg import (
     PoseStamped,
     Transform
 )
+from sensor_msgs.msg import (
+    JointState
+)
 
 def createSequence(keyframes, dt=0.1):
     timestamps = [frame.timestamp for frame in keyframes]
@@ -57,7 +60,7 @@ def callback(message):
 
     print("Setting up kinematics solvers..")
     rospkg.RosPack().get_path('rviz_animator')
-    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.urdf")
+    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.xml")
     chain = tree.getChain("base", "link_roll")
     current_joints = PyKDL.JntArray(chain.getNrOfJoints())
     PyKDL.SetToZero(current_joints)
@@ -84,7 +87,7 @@ def callback(message):
             continue
         
         try:
-            transform_object_to_base = tf_buffer.lookup_transform('world', 'tracked_object', rospy.Time(0))
+            transform_object_to_base = tf_buffer.lookup_transform('base', 'tracked_object', rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             print("Failed to get object to base transform at timestep {} | Real Time: {}".format(t, time.time() - start))
             continue
@@ -97,30 +100,23 @@ def callback(message):
 
         if success != 0:
             print("IK Solver Failed. Status: {}".format(success))
-        else:
-            print("FK Correctness Test:")
-            output_frame = PyKDL.Frame()
-            success = fk_solver.JntToCart(target_joints, output_frame)
-    
-            print("Requested frame:\n{}".format(posemath.toMsg(target_frame)))
-            print("Returned frame:\n{}".format(posemath.toMsg(output_frame)))
+ 
+        target_state = JointState()
+        target_state.header.stamp = rospy.Time.now()
+        target_state.position = list(target_joints)
+        target_state.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
 
+        pub_robot.publish(target_state)
         pub.publish(target_pose)
-        # send to arduino
 
     print("Finished playback.")
 
-def listener():
-    print("Listening for keyframes...")
-    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
-
-    #Wait for messages to arrive on the subscribed topics, and exit the node
-    #when it is killed with Ctrl+C
-    rospy.spin()
-
-#Python's syntax for a main() method
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
     pub = rospy.Publisher('rviz_poses', PoseStamped, queue_size=10)
+    pub_robot = rospy.Publisher('joint_states', JointState, queue_size=10)
 
-    listener()
+    print("Listening for keyframes...")
+    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
+
+    rospy.spin()

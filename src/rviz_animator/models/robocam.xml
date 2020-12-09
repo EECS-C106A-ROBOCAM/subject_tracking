@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<robot name="robocam">
+
+    <!-- Robot Links -->
+    <link name="base">
+        <visual>
+            <geometry>
+                <cylinder length=".065" radius="0.03"/>
+            </geometry>
+            <origin xyz="0 0 .0325" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <link name="link_rot">
+        <visual>
+            <geometry>
+                <cylinder length=".05" radius="0.03"/>
+            </geometry>
+            <origin xyz="0 0 .025" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+    
+    <link name="link_1">
+        <visual>
+            <geometry>
+                <cylinder length=".32" radius="0.03"/>
+            </geometry>
+            <origin xyz="0 -.013 .16" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <link name="link_f1">
+        <visual>
+            <geometry>
+                <cylinder length=".058" radius="0.039"/>
+            </geometry>
+            <origin xyz="0 0 .029" rpy="0 0 0" />
+            <material name='black'>
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_2">
+        <visual>
+            <geometry>
+                <cylinder length=".32" radius="0.03"/>
+            </geometry>
+            <origin xyz="0 0.0121 .16" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_f2">
+        <visual>
+            <geometry>
+                <cylinder length=".0656" radius="0.03"/>
+            </geometry>
+            <origin xyz="0 0 .0328" rpy="0 0 0" />
+            <material name='black'>
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_pitch">
+        <visual>
+            <geometry>
+                <cylinder length=".051" radius="0.0196"/>
+            </geometry>
+            <origin xyz="0 0 .0255" rpy="0 0 0" />
+        </visual>
+    </link>
+    
+    <link name="link_yaw">
+        <visual>
+            <geometry>
+                <cylinder length=".02475" radius="0.01996"/>
+            </geometry>
+            <origin xyz="0 0 .0124" rpy="0 0 0" />
+            <material name='blue'>
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <link name="link_roll">
+        <visual>
+            <geometry>
+                <box size="0.04588 0.04588 0.003"/>
+            </geometry>
+            <origin xyz="0 0 .0015" rpy="0 0 0" />
+        </visual>
+    </link>
+
+    <link name="link_camera">
+        <visual>
+            <geometry>
+                <cylinder length=".002" radius="0.02"/>
+            </geometry>
+            <origin xyz="0 0 .001" rpy="0 0 0" />
+            <material name='green'>
+                <color rgba="0 0.8 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Robot Joints -->
+    <joint name="joint_base_rot" type="revolute">
+        <parent link="base"/>
+        <child link="link_rot"/>
+        <origin xyz="0 0 .065" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
+    </joint>
+
+  
+    <joint name="joint_rot_1" type="revolute">
+        <parent link="link_rot"/>
+        <child link="link_1"/>
+        <origin xyz="0 0.013 .05" rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-.3927" upper="0.3927" velocity="1000"/>
+    </joint>
+
+    <joint name="joint_1_f1" type="fixed">
+        <parent link="link_1"/>
+        <child link="link_f1"/>
+        <origin xyz="0 0 .32" rpy="-0.5470 0 0" />
+    </joint>
+
+    <joint name="joint_f1_2" type="revolute">
+        <parent link="link_f1"/>
+        <child link="link_2"/>
+        <origin xyz="0 0.0117 0.0374" rpy="-1.57 0 0" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-.3927" upper=".3927" velocity="1000"/>
+    </joint>
+
+    <joint name="joint_2_f2" type="fixed">
+        <parent link="link_2"/>
+        <child link="link_f2"/>
+        <origin xyz="0 0.0168 .32" rpy="0.4672 0 0" />
+    </joint>
+
+    <joint name="joint_f2_pitch" type="revolute">
+        <parent link="link_f2"/>
+        <child link="link_pitch"/>
+        <origin xyz="0 0 0.0603" rpy="-.4672 0 0" />
+        <axis xyz="1 0 0" />
+        <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
+    </joint>
+
+    <joint name="joint_pitch_yaw" type="revolute">
+        <parent link="link_pitch"/>
+        <child link="link_yaw"/>
+        <origin xyz="0 -0.0196 .038655" rpy="1.57 0 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
+    </joint>
+
+    <joint name="joint_yaw_roll" type="revolute">
+        <parent link="link_yaw"/>
+        <child link="link_roll"/>
+        <origin xyz="0 0.02182 0.01582" rpy="1.57 0 0" />
+        <axis xyz="0 0 1" />
+        <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
+    </joint>
+
+    <joint name="joint_roll_camera" type="fixed">
+        <parent link="link_roll"/>
+        <child link="link_camera"/>
+        <origin xyz="0 0 -.003" rpy="0 0 0" />
+    </joint>
+</robot>
