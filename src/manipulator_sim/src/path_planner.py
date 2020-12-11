@@ -31,6 +31,7 @@ class PathPlanner(object):
         group_name: the name of the move_group.
             For Baxter, this would be 'left_arm' or 'right_arm'
             For Sawyer, this would be 'right_arm'
+            For robocam, this would be 'robocam_arm'
         """
 
         # If the node is shutdown, call this function    
