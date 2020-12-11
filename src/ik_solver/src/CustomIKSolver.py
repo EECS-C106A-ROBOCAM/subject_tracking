@@ -19,21 +19,25 @@ from ik_solver.srv import (
     SolveIKSrv
 )
 
-def solveIK(req):
+def callback(req):
+    targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
+
+
+def solveIK(targetFrame):
     """ CONSTANTS """
     BASE_TO_BASE_YAW = PyKDL.Vector(0, -0.032, 0.083)           # Correct
     BASE_YAW_TO_BOTTOM_4B = PyKDL.Vector(0, 0.012, 0.041)       # Correct
-    BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(0, 0, 0.34)       # GUESS - screw collision
+    BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(0, 0, 0.336)      # Correct
     BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(0, 0.030, 0.026)     # Correct
-    TOP_4B_TO_TOP_4B_END = PyKDL.Vector(0, 0.34, 0)             # GUESS - screw collision
+    TOP_4B_TO_TOP_4B_END = PyKDL.Vector(0, 0.336, 0)            # Correct
     TOP_4B_END_TO_CAMERA_PITCH = PyKDL.Vector(0, 0.046, 0.006)  # Correct
     CAMERA_PITCH_TO_CAMERA_YAW = PyKDL.Vector(0, 0.039, 0.013)  # Correct
     CAMERA_YAW_TO_CAMERA_ROLL = PyKDL.Vector(0, 0.021, 0.017)   # Correct  
     CAMERA_ROLL_TO_CAMERA = PyKDL.Vector(0, 0.008, 0.024)       # Correct
+    JOINT_1_OFFSET_DEG = 90                                     # Correct
     JOINT_2_OFFSET_DEG = 90                                     # Correct
     JOINT_3_OFFSET_DEG = -30                                    # Correct
 
-    targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
 
     # 1. Solve for J4, J5_initial, J6
     # First, convert quaternion orientation to XZY order Euler angles
@@ -92,8 +96,8 @@ def solveIK(req):
     # print("Camera offset: {}".format(cameraFrame.p))
     # print("Camera Yaw offset: {}".format(cameraYawFrame.p))
     # print("CameraYaw-to-Camera Fixed XYZ displacement: {}".format(cameraYawToCameraDisplacement))
-    # print("Orange Point: {}".format(orangePoint))
-    # print("Camera orientation: {}".format(cameraFrame.M.GetQuaternion()))
+    print("Orange Point: {}".format(orangePoint))
+    print("Camera orientation: {}".format(cameraFrame.M.GetQuaternion()))
 
     # 3. Convert orange point to cylindrical coordinates
     orange_X, orange_Y, orange_Z = orangePoint
@@ -111,9 +115,13 @@ def solveIK(req):
     elbowOffset_RZ = np.array([BOTTOM_4B_END_TO_TOP_4B.y(), BOTTOM_4B_END_TO_TOP_4B.z()])
     shoulderOffset_RZ = np.array([BASE_TO_BASE_YAW.y() + BASE_YAW_TO_BOTTOM_4B.y(), BASE_TO_BASE_YAW.z() + BASE_YAW_TO_BOTTOM_4B.z()])
 
-    # TODO(JS): Subtract pitch static offset part!
+    # Also remove the dynamic offset from the camera pitch link 
+    cameraPitchOffset_global = PyKDL.Frame(PyKDL.Rotation.RotX(J4)) * CAMERA_PITCH_TO_CAMERA_YAW 
+    cameraPitchOffset_RZ =  np.array([cameraPitchOffset_global.y(), cameraPitchOffset_global.z()])
+    print("Camera Pitch Offset: {}".format(cameraPitchOffset_RZ))
 
-    targetPoint_RZ = targetPointOrig_RZ - staticWristOffset_RZ - elbowOffset_RZ - shoulderOffset_RZ
+
+    targetPoint_RZ = targetPointOrig_RZ - staticWristOffset_RZ - elbowOffset_RZ - shoulderOffset_RZ - cameraPitchOffset_RZ
 
     # print("Need to solve 2D 2-link IK from (0, 0) to ({}, {})".format(*targetPoint_RZ))
 
@@ -143,7 +151,7 @@ def solveIK(req):
     # print("To reach simple (R, Z) = ({}, {}), set J2={} J3={}".format(targetPoint_RZ[0], targetPoint_RZ[1], math.degrees(J2), math.degrees(J3)))
     
     # 5. Use the Theta from cylindrical coordinates as the J1 angle, and update J5 accordingly
-    J1 = orange_Theta
+    J1 = orange_Theta - math.radians(JOINT_1_OFFSET_DEG)
     J5 = J5_initial - orange_Theta
     # 5. Complete (above)
 
@@ -211,7 +219,7 @@ def solveIK(req):
 
 def testIK():
     """ CHANGE ME """
-    pitch_deg, yaw_deg, roll_deg = 10, 20, 30
+    pitch_deg, yaw_deg, roll_deg = 0, 0, 0 #np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-90, 90)
     x, y, z = 0.0, 0.4, 0.2 # in meters
 
     targetVector = PyKDL.Vector(x, y, z)
@@ -223,22 +231,16 @@ def testIK():
     targetRotation = PyKDL.Rotation.Quaternion(*targetQuat)
 
     targetFrame = PyKDL.Frame(targetRotation, targetVector)
-    targetPose = posemath.toMsg(targetFrame)
 
-    targetPoseStamped = PoseStamped()
-    targetPoseStamped.pose = targetPose
-
-    jointAngles = solveIK(targetPoseStamped)
+    jointAngles = solveIK(targetFrame)
     print("sent!")
 
 
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
-    s = rospy.Service("solve_ik", SolveIKSrv, solveIK)
+    s = rospy.Service("solve_ik", SolveIKSrv, callback)
 
-
-
-    # testIK()
+    testIK()
 
     print("Listening for IK requests...")
     rospy.spin()
