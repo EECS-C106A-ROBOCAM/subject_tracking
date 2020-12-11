@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="robot_description" command="cat $(find rviz_animator)/models/robocam.xml" />
+
+  <node name="ik_solver" pkg="ik_solver" type="ik_solver" output="screen"/>
+
+</launch>
