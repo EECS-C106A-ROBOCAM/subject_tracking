@@ -11,9 +11,29 @@ from geometry_msgs.msg import (
     PoseStamped
 )
 
+from sensor_msgs.msg import (
+    JointState
+)
 
-def solveIK(targetPoseStamped):
-    targetFrame = posemath.fromMsg(targetPoseStamped.pose) # Target pose as KDL frame
+from ik_solver.srv import (
+    SolveIKSrv
+)
+
+def solveIK(req):
+    """ CONSTANTS """
+    BASE_TO_BASE_YAW = PyKDL.Vector(0, -0.032, 0.083)           # Correct
+    BASE_YAW_TO_BOTTOM_4B = PyKDL.Vector(0, 0.012, 0.041)       # Correct
+    BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(0, 0, 0.34)       # GUESS - screw collision
+    BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(0, 0.030, 0.026)     # Correct
+    TOP_4B_TO_TOP_4B_END = PyKDL.Vector(0, 0.34, 0)             # GUESS - screw collision
+    TOP_4B_END_TO_CAMERA_PITCH = PyKDL.Vector(0, 0.046, 0.006)  # Correct
+    CAMERA_PITCH_TO_CAMERA_YAW = PyKDL.Vector(0, 0.039, 0.013)  # Correct
+    CAMERA_YAW_TO_CAMERA_ROLL = PyKDL.Vector(0, 0.021, 0.017)   # Correct  
+    CAMERA_ROLL_TO_CAMERA = PyKDL.Vector(0, 0.008, 0.024)       # Correct
+    JOINT_2_OFFSET_DEG = 90                                     # Correct
+    JOINT_3_OFFSET_DEG = -30                                    # Correct
+
+    targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
 
     # 1. Solve for J4, J5_initial, J6
     # First, convert quaternion orientation to XZY order Euler angles
@@ -33,9 +53,9 @@ def solveIK(targetPoseStamped):
     cameraYawJoint = PyKDL.Joint(PyKDL.Joint.RotZ)
     cameraRollJoint = PyKDL.Joint(PyKDL.Joint.RotY)
 
-    camPitchToYaw = PyKDL.Frame(PyKDL.Vector(0, 0.03, 0.02)) # TODO(JS): Get these constants [m] from URDF/CAD
-    camYawToRoll = PyKDL.Frame(PyKDL.Vector(0, 0.02, 0.02))
-    camRollToCam = PyKDL.Frame(PyKDL.Vector(0, 0, 0.025))
+    camPitchToYaw = PyKDL.Frame(CAMERA_PITCH_TO_CAMERA_YAW)
+    camYawToRoll = PyKDL.Frame(CAMERA_YAW_TO_CAMERA_ROLL)
+    camRollToCam = PyKDL.Frame(CAMERA_ROLL_TO_CAMERA)
 
     cameraPitchSegment = PyKDL.Segment(cameraPitchJoint, camPitchToYaw)
     cameraYawSegment = PyKDL.Segment(cameraYawJoint, camYawToRoll)
@@ -72,9 +92,7 @@ def solveIK(targetPoseStamped):
     # print("Camera offset: {}".format(cameraFrame.p))
     # print("Camera Yaw offset: {}".format(cameraYawFrame.p))
     # print("CameraYaw-to-Camera Fixed XYZ displacement: {}".format(cameraYawToCameraDisplacement))
-    print("Orange Point: {}".format(orangePoint))
-    
-
+    # print("Orange Point: {}".format(orangePoint))
     # print("Camera orientation: {}".format(cameraFrame.M.GetQuaternion()))
 
     # 3. Convert orange point to cylindrical coordinates
@@ -82,21 +100,25 @@ def solveIK(targetPoseStamped):
     orange_R = math.sqrt(orange_X ** 2 + orange_Y ** 2)
     orange_Theta = math.atan2(orange_Y, orange_X) # Theta measured from global positive X axis
     # 3. Complete: (above)
-    print("Orange R: {} Theta: {}".format(orange_R, math.degrees(orange_Theta)))
+
+    # print("Orange R: {} Theta: {}".format(orange_R, math.degrees(orange_Theta)))
 
     # 4. Solve for J2 and J3 in the idealized R-Z plane
     targetPointOrig_RZ = np.array([orange_R, orange_Z])
 
     # First, remove the fixed offsets from the wrist, elbow, and shoulder pieces
-    wristOffset_RZ = np.array([0.07, -0.02]) # TODO(JS): Get this from CAD/URDF
-    elbowOffset_RZ = np.array([0.035, 0.01])
-    shoulderOffset_RZ = np.array([-0.02, 0.12])
+    staticWristOffset_RZ = np.array([TOP_4B_END_TO_CAMERA_PITCH.y(), TOP_4B_END_TO_CAMERA_PITCH.z()])
+    elbowOffset_RZ = np.array([BOTTOM_4B_END_TO_TOP_4B.y(), BOTTOM_4B_END_TO_TOP_4B.z()])
+    shoulderOffset_RZ = np.array([BASE_TO_BASE_YAW.y() + BASE_YAW_TO_BOTTOM_4B.y(), BASE_TO_BASE_YAW.z() + BASE_YAW_TO_BOTTOM_4B.z()])
 
-    targetPoint_RZ = targetPointOrig_RZ - wristOffset_RZ - elbowOffset_RZ - shoulderOffset_RZ
-    print("Need to solve 2D 2-link IK from (0, 0) to ({}, {})".format(*targetPoint_RZ))
+    # TODO(JS): Subtract pitch static offset part!
+
+    targetPoint_RZ = targetPointOrig_RZ - staticWristOffset_RZ - elbowOffset_RZ - shoulderOffset_RZ
+
+    # print("Need to solve 2D 2-link IK from (0, 0) to ({}, {})".format(*targetPoint_RZ))
 
     # The following steps use the same labels as the classic 2D planar IK derivation
-    a1, a2 = 0.3, 0.3
+    a1, a2 = BOTTOM_4B_TO_BOTTOM_4B_END.z(), TOP_4B_TO_TOP_4B_END.y()
     ik_x, ik_y = targetPoint_RZ
     
     q2_a = math.acos((ik_x ** 2 + ik_y ** 2 - a1 ** 2 - a2 ** 2) / (2 * a1 * a2))
@@ -109,15 +131,16 @@ def solveIK(targetPoseStamped):
     q1, q2 = q1_a, q2_a # TODO(JS): Is this always the better one?
 
     J2_initial = q1
-    J2_offset = math.radians(90) # J3's zero position is vertical, not horizontal
+    J2_offset = math.radians(JOINT_2_OFFSET_DEG) # J3's zero position is vertical, not horizontal
     J2 = J2_initial - J2_offset
 
     # Since we have a parallel link, the angle for J3 is not simply q2. Instead, use transversal
     J3_initial = q1 - q2
-    J3_offset = math.radians(-60) # J2's zero position is below horizontal
+    J3_offset = math.radians(JOINT_3_OFFSET_DEG) # J2's zero position is below horizontal
     J3 = J3_initial - J3_offset
     # 4. Complete (above)
-    print("To reach simple (R, Z) = ({}, {}), set J2={} J3={}".format(targetPoint_RZ[0], targetPoint_RZ[1], math.degrees(J2), math.degrees(J3)))
+
+    # print("To reach simple (R, Z) = ({}, {}), set J2={} J3={}".format(targetPoint_RZ[0], targetPoint_RZ[1], math.degrees(J2), math.degrees(J3)))
     
     # 5. Use the Theta from cylindrical coordinates as the J1 angle, and update J5 accordingly
     J1 = orange_Theta
@@ -139,8 +162,8 @@ def solveIK(targetPoseStamped):
     bot4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
     top4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
 
-    baseToBaseYaw = PyKDL.Frame(PyKDL.Vector(0, -0.02, 0.06))
-    baseYawToBot4B = PyKDL.Frame(PyKDL.Vector(0, shoulderOffset_RZ[0] - baseToBaseYaw.p.y(), shoulderOffset_RZ[1] - baseToBaseYaw.p.z())) #TODO(JS): This hack is to keep measurements accurate
+    baseToBaseYaw = PyKDL.Frame(BASE_TO_BASE_YAW)
+    baseYawToBot4B = PyKDL.Frame(BASE_YAW_TO_BOTTOM_4B)
     """
     bot4BToBot4BFake = PyKDL.Frame(PyKDL.Vector(0, 0, a1))
     bot4BFakeToTop4B = PyKDL.Frame(PyKDL.Vector(0, elbowOffset_RZ[0], elbowOffset_RZ[1]))
@@ -178,7 +201,12 @@ def solveIK(targetPoseStamped):
     print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
     print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
 
-    return jointAngles
+    # 7. Create JointState message for return
+    ret = JointState()
+    ret.header.stamp = rospy.Time.now()
+    ret.position = jointAngles
+
+    return ret
     
 
 def testIK():
@@ -206,9 +234,11 @@ def testIK():
 
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
-    rospy.Subscriber("target_pose", PoseStamped, solveIK)
+    s = rospy.Service("solve_ik", SolveIKSrv, solveIK)
 
-    testIK()
+
+
+    # testIK()
 
     print("Listening for IK requests...")
     rospy.spin()

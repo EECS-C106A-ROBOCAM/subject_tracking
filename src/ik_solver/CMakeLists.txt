@@ -15,7 +15,7 @@ find_package(catkin REQUIRED
 
 add_service_files(
   FILES
-  SolveIK.srv
+  SolveIKSrv.srv
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs geometry_msgs)
