@@ -85,10 +85,10 @@ def solveIK(targetPoseStamped):
     print("Orange R: {} Theta: {}".format(orange_R, math.degrees(orange_Theta)))
 
     # 4. Solve for J2 and J3 in the idealized R-Z plane
-    targetPointOrig_RZ = np.array([0.50, 0.12]) #np.array([orange_R, orange_Z])
+    targetPointOrig_RZ = np.array([orange_R, orange_Z])
 
     # First, remove the fixed offsets from the wrist, elbow, and shoulder pieces
-    wristOffset_RZ = np.array([0.025, -0.045]) # TODO(JS): Get this from CAD/URDF
+    wristOffset_RZ = np.array([0.07, -0.02]) # TODO(JS): Get this from CAD/URDF
     elbowOffset_RZ = np.array([0.035, 0.01])
     shoulderOffset_RZ = np.array([-0.02, 0.12])
 
@@ -119,15 +119,72 @@ def solveIK(targetPoseStamped):
     # 4. Complete (above)
     print("To reach simple (R, Z) = ({}, {}), set J2={} J3={}".format(targetPoint_RZ[0], targetPoint_RZ[1], math.degrees(J2), math.degrees(J3)))
     
+    # 5. Use the Theta from cylindrical coordinates as the J1 angle, and update J5 accordingly
+    J1 = orange_Theta
+    J5 = J5_initial - orange_Theta
+    # 5. Complete (above)
+
+    jointAngles = [J1, J2, J3, J4, J5, J6]
+    jointAngles_deg = [math.degrees(j) for j in jointAngles]
+    print("Final joint angles: {}".format(jointAngles_deg))
+
+    # 6. (optional) Sanity check on solution:
+    completeArmChain = PyKDL.Chain()
     
+    baseYawJoint = PyKDL.Joint(PyKDL.Joint.RotZ)
+    bot4BJoint = PyKDL.Joint(PyKDL.Joint.RotX)
+    top4BJoint = PyKDL.Joint(PyKDL.Joint.RotX)
+
+    # Use Fake joints to artificially create 4 bar parallel constraint
+    bot4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
+    top4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
+
+    baseToBaseYaw = PyKDL.Frame(PyKDL.Vector(0, -0.02, 0.06))
+    baseYawToBot4B = PyKDL.Frame(PyKDL.Vector(0, shoulderOffset_RZ[0] - baseToBaseYaw.p.y(), shoulderOffset_RZ[1] - baseToBaseYaw.p.z())) #TODO(JS): This hack is to keep measurements accurate
+    """
+    bot4BToBot4BFake = PyKDL.Frame(PyKDL.Vector(0, 0, a1))
+    bot4BFakeToTop4B = PyKDL.Frame(PyKDL.Vector(0, elbowOffset_RZ[0], elbowOffset_RZ[1]))
+    top4BToTop4BFake = PyKDL.Frame(PyKDL.Vector(0, a2 * math.cos(J3_offset), a2 * math.sin(J3_offset)))
+    """
+    # TODO(JS): Remove need for this magic stuff
+    fixedBaseJoint = PyKDL.Joint(PyKDL.Joint.RotX) # won't actually spin
+    magic4BJoint = PyKDL.Joint(PyKDL.Joint.RotX) # won't actually sping
+    magic4BFrame = PyKDL.Frame(targetFrame.p - cameraFrame.p)
+    
+    baseSegment = PyKDL.Segment(fixedBaseJoint, baseToBaseYaw)
+    baseYawSegment = PyKDL.Segment(baseYawJoint, baseYawToBot4B)
+    magic4BSegment = PyKDL.Segment(magic4BJoint, magic4BFrame)
+
+    completeArmChain.addSegment(baseSegment)
+    completeArmChain.addSegment(baseYawSegment)
+    completeArmChain.addSegment(magic4BSegment)
+    completeArmChain.addChain(cameraOffsetChain)
+
+    completeArmChainFK = PyKDL.ChainFkSolverPos_recursive(completeArmChain)
+
+    solvedJoints = PyKDL.JntArray(6)
+    solvedJoints[0] = 0 # Fake joint
+    solvedJoints[1] = J1
+    solvedJoints[2] = 0 # Fake joint
+    solvedJoints[3] = J4
+    solvedJoints[4] = J5
+    solvedJoints[5] = J6
+
+    print("# Joints: {} # Segments: {}".format(completeArmChain.getNrOfJoints(), completeArmChain.getNrOfSegments()))
+    
+    producedFrame = PyKDL.Frame()
+    rc = completeArmChainFK.JntToCart(solvedJoints, producedFrame)
+    print("Result: {}".format(rc))
+    print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
+    print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
+
+    return jointAngles
     
 
 def testIK():
-    pub = rospy.Publisher("target_pose", PoseStamped, queue_size=10)
-
     """ CHANGE ME """
-    pitch_deg, yaw_deg, roll_deg = 0, 0, 0
-    x, y, z = 0.2, 0.4, 0.2 # in meters
+    pitch_deg, yaw_deg, roll_deg = 10, 20, 30
+    x, y, z = 0.0, 0.4, 0.2 # in meters
 
     targetVector = PyKDL.Vector(x, y, z)
 
@@ -143,7 +200,7 @@ def testIK():
     targetPoseStamped = PoseStamped()
     targetPoseStamped.pose = targetPose
 
-    pub.publish(targetPoseStamped)
+    jointAngles = solveIK(targetPoseStamped)
     print("sent!")
 
 
@@ -151,8 +208,7 @@ if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
     rospy.Subscriber("target_pose", PoseStamped, solveIK)
 
+    testIK()
+
     print("Listening for IK requests...")
-    rate = rospy.Rate(1)
-    while not rospy.is_shutdown():
-        testIK()
-        rate.sleep()
+    rospy.spin()
