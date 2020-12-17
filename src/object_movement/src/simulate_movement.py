@@ -45,23 +45,23 @@ def simulate_movement(reference_frame="world", max_speed=1, refresh_rate=30, upd
         print("ROS interrupt: {0}".format(e))
 
 
-def simulate_movement_linear(reference_frame="world", max_speed=1, refresh_rate=30, speed=0.01, limit=0.25):
+def simulate_movement_linear(reference_frame="world", max_speed=1, refresh_rate=30, speed=0.1, limit=0.25):
     rate = rospy.Rate(refresh_rate)
 
     try:
         curr_pose= Pose()
         curr_pose.orientation.w = 1
-        curr_pose.position.y = -limit
+        curr_pose.position.x = -limit
         while not rospy.is_shutdown():      
-            while curr_pose.position.y < limit:          
-                curr_pose.position.y += speed / refresh_rate
+            while curr_pose.position.x < limit:          
+                curr_pose.position.x += speed / refresh_rate
                 register_frame(curr_pose)
                 rate.sleep()
-            while curr_pose.position.y > -limit:          
-                curr_pose.position.y -= speed / refresh_rate           
+            while curr_pose.position.x > -limit:          
+                curr_pose.position.x -= speed / refresh_rate           
                 register_frame(curr_pose)
                 rate.sleep()
-            curr_pose.position.y = -limit
+            curr_pose.position.x = -limit
             
     except rospy.ROSInterruptException, e:
         print("ROS interrupt: {0}".format(e))

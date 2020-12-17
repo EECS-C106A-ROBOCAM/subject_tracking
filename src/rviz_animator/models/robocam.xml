@@ -64,7 +64,7 @@
         </collision>
     </link>
 
-    <link name="link_1_mimic">
+    <!-- <link name="link_1_mimic">
         <visual>
             <geometry>
                 <cylinder length=".32" radius="0.005"/>
@@ -87,7 +87,7 @@
             </geometry>
             <origin xyz="0 0 .16" rpy="0 0 0" />
         </collision>
-    </link>
+    </link> -->
 
     <link name="link_f1">
         <visual>
@@ -136,7 +136,7 @@
         </collision>
     </link>
 
-    <link name="link_2_mimic">
+    <!-- <link name="link_2_mimic">
         <visual>
             <geometry>
                 <cylinder length=".32" radius="0.005"/>
@@ -159,7 +159,7 @@
             </geometry>
             <origin xyz="0 -.117 .16" rpy="0 0 0" />
         </collision>
-    </link>
+    </link> -->
 
     <link name="link_f2"> <visual>
             <geometry>
@@ -296,15 +296,13 @@
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-.3927" upper="0.3927" velocity="1000"/>
     </joint>
-
-    <joint name="joint_rot_1_mimic" type="revolute">
+<!-- 
+    <joint name="joint_rot_1_mimic" type="continuous">
         <parent link="link_rot"/>
         <child link="link_1_mimic"/>
         <origin xyz="0 -0.01 .07" rpy="0 0 0" />
-        <axis xyz="1 0 0" />
-        <limit effort="1000.0" lower="-.3927" upper="0.3927" velocity="1000"/>
         <mimic joint="joint_rot_1" multiplier="1" offset="0"/>
-    </joint>
+    </joint> -->
 
     <joint name="joint_1_f1" type="fixed">
         <parent link="link_1"/>
@@ -312,12 +310,12 @@
         <origin xyz="0 0 .32" rpy="-0.5470 0 0" />
     </joint>
 
-    <joint name="joint_1_mimic_f1" type="continuous">
+    <!-- <joint name="joint_1_mimic_f1" type="continuous">
         <parent link="link_1_mimic"/>
         <child link="link_f1"/>
         <origin xyz="0 0 .32" rpy="-0.5470 0 0" />
         <mimic joint="joint_rot_1" multiplier="-1" offset="0"/>
-    </joint>
+    </joint> -->
 
     <joint name="joint_f1_2" type="revolute">
         <parent link="link_f1"/>
@@ -327,7 +325,7 @@
         <limit effort="1000.0" lower="-.3927" upper=".3927" velocity="1000"/>
     </joint>
 
-    <joint name="joint_f1_2_mimic" type="continuous">
+    <!-- <joint name="joint_f1_2_mimic" type="continuous">
         <parent link="link_f1"/>
         <child link="link_2_mimic"/>
         <origin xyz="0 0.02 0.0174" rpy="-1.57 0 0" />
@@ -340,7 +338,7 @@
         <child link="link_f2"/>
         <origin xyz="0 0 .32" rpy="0.4672 0 0" />
         <mimic joint="joint_f1_2" multiplier="-1" offset="0"/>
-    </joint>
+    </joint> -->
 
     <joint name="joint_2_f2" type="fixed">
         <parent link="link_2"/>
