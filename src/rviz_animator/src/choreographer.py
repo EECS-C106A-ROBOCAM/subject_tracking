@@ -10,6 +10,7 @@ import warnings
 import traceback
 import numpy as np
 import kdl_parser_py.urdf as parser
+from urdf_parser_py.urdf import URDF
 
 warnings.filterwarnings('ignore', category=UserWarning)
 import quaternion

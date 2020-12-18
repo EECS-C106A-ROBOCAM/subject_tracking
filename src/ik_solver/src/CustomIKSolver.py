@@ -2,13 +2,17 @@
 
 import tf
 import rospy
+import rospkg
 from tf_conversions import posemath
 import PyKDL
 import math
 import numpy as np
+from urdf_parser_py.urdf import URDF 
+import kdl_parser_py.urdf as parser
 
 from geometry_msgs.msg import (
-    PoseStamped
+    PoseStamped,
+    PointStamped
 )
 
 from sensor_msgs.msg import (
@@ -22,22 +26,49 @@ from ik_solver.srv import (
 def callback(req):
     targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
 
+def createFrameFromURDF(robot, joint_name):
+    position = PyKDL.Vector(*(robot.joint_map[joint_name].origin.xyz))
+    rotation = PyKDL.Rotation.RPY(*(robot.joint_map[joint_name].origin.rpy))
+    return PyKDL.Frame(position, rotation)
 
 def solveIK(targetFrame):
     """ CONSTANTS """
-    BASE_TO_BASE_YAW = PyKDL.Vector(0, -0.032, 0.083)           # Correct
-    BASE_YAW_TO_BOTTOM_4B = PyKDL.Vector(0, 0.012, 0.041)       # Correct
-    BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(0, 0, 0.336)      # Correct
-    BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(0, 0.030, 0.026)     # Correct
-    TOP_4B_TO_TOP_4B_END = PyKDL.Vector(0, 0.336, 0)            # Correct
-    TOP_4B_END_TO_CAMERA_PITCH = PyKDL.Vector(0, 0.046, 0.006)  # Correct
-    CAMERA_PITCH_TO_CAMERA_YAW = PyKDL.Vector(0, 0.039, 0.013)  # Correct
-    CAMERA_YAW_TO_CAMERA_ROLL = PyKDL.Vector(0, 0.021, 0.017)   # Correct  
-    CAMERA_ROLL_TO_CAMERA = PyKDL.Vector(0, 0.008, 0.024)       # Correct
-    JOINT_1_OFFSET_DEG = 90                                     # Correct
-    JOINT_2_OFFSET_DEG = 90                                     # Correct
-    JOINT_3_OFFSET_DEG = -30                                    # Correct
+    robot = URDF.from_parameter_server()
+    print(robot.joint_map['joint_base_rot'].origin.xyz)
+    ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.xml")
+    #chain = tree.getChain("base", "link_roll")
+    chain = tree.getChain('base', 'link_camera')
+    print(tree.getNrOfSegments())
+    for i in range(chain.getNrOfSegments()):
+        print(chain.getSegment(i))
+    return
+    # BASE_TO_BASE_YAW = PyKDL.Vector(0, -0.032, 0.083)           # Correct
+    # BASE_YAW_TO_BOTTOM_4B = PyKDL.Vector(0, 0.012, 0.041)       # Correct
+    # BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(0, 0, 0.336)      # Correct
+    # BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(0, 0.030, 0.026)     # Correct
+    # TOP_4B_TO_TOP_4B_END = PyKDL.Vector(0, 0.336, 0)            # Correct
+    # TOP_4B_END_TO_CAMERA_PITCH = PyKDL.Vector(0, 0.046, 0.006)  # Correct
+    # CAMERA_PITCH_TO_CAMERA_YAW = PyKDL.Vector(0, 0.039, 0.013)  # Correct
+    # CAMERA_YAW_TO_CAMERA_ROLL = PyKDL.Vector(0, 0.021, 0.017)   # Correct  
+    # CAMERA_ROLL_TO_CAMERA = PyKDL.Vector(0, 0.008, 0.024)       # Correct
+    # JOINT_1_OFFSET_DEG = 90                                     # Correct
+    # JOINT_2_OFFSET_DEG = 90                                     # Correct
+    # JOINT_3_OFFSET_DEG = -30                                    # Correct
 
+
+    # BASE_TO_BASE_ROT = PyKDL.Vector(*(robot.joint_map['joint_base_rot'].origin.xyz))
+    # BASE_ROT_TO_BOTTOM_4B = PyKDL.Vector(*(robot.joint_map['joint_rot_bottom_4bar'].origin.xyz))
+    # BOTTOM_4B_TO_BOTTOM_4B_END = PyKDL.Vector(*(robot.joint_map['joint_bottom_4bar_bottom_4bar_end'].origin.xyz))
+    # BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(*(robot.joint_map['joint_bottom_4bar_end_top_4bar'].origin.xyz))
+    # BOTTOM_4B_END_TO_TOP_4B = PyKDL.Vector(*(robot.joint_map['joint_bottom_4bar_end_top_4bar'].origin.xyz))
+
+
+    # JOINT_BASE_ROT = createFrameFromURDF(robot, 'joint_base_rot')
+    # joint_ROT_BOTTOM_4BAR = createFrameFromURDF(robot, 'joint_base_rot')
+    # JOINT_BASE_ROT = createFrameFromURDF(robot, 'joint_base_rot')
+    # JOINT_BASE_ROT = createFrameFromURDF(robot, 'joint_base_rot')
+    # JOINT_BASE_ROT = createFrameFromURDF(robot, 'joint_base_rot')
+    # JOINT_BASE_ROT = createFrameFromURDF(robot, 'joint_base_rot')
 
     # 1. Solve for J4, J5_initial, J6
     # First, convert quaternion orientation to XZY order Euler angles
@@ -160,6 +191,33 @@ def solveIK(targetFrame):
     print("Final joint angles: {}".format(jointAngles_deg))
 
     # 6. (optional) Sanity check on solution:
+    sanityTest(BASE_TO_BASE_YAW, BASE_YAW_TO_BOTTOM_4B, targetFrame, cameraFrame, cameraOffsetChain, jointAngles)
+
+    # 7. Create JointState message for return
+    ret = JointState()
+    ret.header.stamp = rospy.Time.now()
+    ret.position = jointAngles
+
+    orangePointStamped = PointStamped()
+    orangePointStamped.header.frame_id = "world"
+    orangePointStamped.header.stamp = rospy.Time.now()
+    orangePointStamped.point.x, orangePointStamped.point.y, orangePointStamped.point.z = orangePoint
+
+    pinkPointStamped = PointStamped()
+    pinkPointStamped.header.frame_id = "world"
+    pinkPointStamped.header.stamp = rospy.Time.now()
+
+    pinkPointStamped.point.x, pinkPointStamped.point.y, pinkPointStamped.point.z = targetFrame.p
+
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        pub.publish(orangePointStamped)
+        pub2.publish(pinkPointStamped)
+        rate.sleep()
+    return ret
+
+
+def sanityTest(BASE_TO_BASE_YAW, BASE_YAW_TO_BOTTOM_4B, targetFrame, cameraFrame, cameraOffsetChain, jointAngles):
     completeArmChain = PyKDL.Chain()
     
     baseYawJoint = PyKDL.Joint(PyKDL.Joint.RotZ)
@@ -195,11 +253,11 @@ def solveIK(targetFrame):
 
     solvedJoints = PyKDL.JntArray(6)
     solvedJoints[0] = 0 # Fake joint
-    solvedJoints[1] = J1
+    solvedJoints[1] = jointAngles[0]
     solvedJoints[2] = 0 # Fake joint
-    solvedJoints[3] = J4
-    solvedJoints[4] = J5
-    solvedJoints[5] = J6
+    solvedJoints[3] = jointAngles[3]
+    solvedJoints[4] = jointAngles[4]
+    solvedJoints[5] = jointAngles[5]
 
     print("# Joints: {} # Segments: {}".format(completeArmChain.getNrOfJoints(), completeArmChain.getNrOfSegments()))
     
@@ -209,18 +267,10 @@ def solveIK(targetFrame):
     print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
     print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
 
-    # 7. Create JointState message for return
-    ret = JointState()
-    ret.header.stamp = rospy.Time.now()
-    ret.position = jointAngles
-
-    return ret
-    
-
 def testIK():
     """ CHANGE ME """
-    pitch_deg, yaw_deg, roll_deg = 0, 0, 0 #np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-90, 90)
-    x, y, z = 0.0, 0.4, 0.2 # in meters
+    pitch_deg, yaw_deg, roll_deg = 0, 0, -90 #np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-90, 90)
+    x, y, z = -0.024, 0.0789, 0.29881 # in meters
 
     targetVector = PyKDL.Vector(x, y, z)
 
@@ -239,6 +289,8 @@ def testIK():
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
     s = rospy.Service("solve_ik", SolveIKSrv, callback)
+    pub = rospy.Publisher("orange_pub", PointStamped, queue_size=10)
+    pub2 = rospy.Publisher("pink_pub", PointStamped, queue_size=10)
 
     testIK()
 
