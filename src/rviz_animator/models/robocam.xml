@@ -259,7 +259,6 @@
         <visual>
             <geometry>
                 <cylinder length=".005" radius="0.02"/>
-                <cylinder length=".01" radius="0.01"/>
             </geometry>
             <origin xyz="0 0 .001" rpy="1.57 0 0" />
             <material name='green'>
