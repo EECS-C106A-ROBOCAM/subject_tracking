@@ -69,7 +69,7 @@ def track_aruco(message):
         tf2Stamp.header.frame_id = 'link_camera'
         tf2Stamp.child_frame_id = 'tracked_object'
         tf2Stamp.transform.translation.x, tf2Stamp.transform.translation.y, tf2Stamp.transform.translation.z = x, y, z
-        tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = quaternion
+        tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = 0, 0, -np.sqrt(2) / 2, np.sqrt(2) / 2
         tf2Broadcast.sendTransform(tf2Stamp)
 
 if __name__ == '__main__':
