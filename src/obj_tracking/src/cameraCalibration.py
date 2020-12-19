@@ -5,6 +5,7 @@ import numpy as np
 import os
 import glob
 import pickle
+import rospkg
 
 # Defining the dimensions of checkerboard
 CHECKERBOARD = (6,8)
@@ -22,7 +23,8 @@ objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 prev_img_shape = None
 
 # Extracting path of individual image stored in a given directory
-images = glob.glob('./src/aruco_pkg/images/*.jpg')
+images = glob.glob(rospkg.RosPack().get_path('obj_tracking') + '/images/checkerboard*.jpg')
+print(len(images))
 for fname in images:
     img = cv2.imread(fname)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -44,9 +46,9 @@ for fname in images:
         # Draw and display the corners
         img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
     
+    print("Image {} loaded.".format(fname))    
     # cv2.imshow('img',img)
     # cv2.waitKey(0)
-    print("Image {} loaded.".format(fname))
 
 cv2.destroyAllWindows()
 
@@ -59,9 +61,17 @@ and corresponding pixel coordinates of the
 detected corners (imgpoints)
 """
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
-with open('./src/aruco_pkg/data/calib_mtx_dist.pkl', 'wb') as handle:
-    pickle.dump([mtx, dist], handle)
+dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+x,y,w,h = roi
+print('W: {} H: {}'.format(w, h))
+frame = dst[y:y+h, x:x+w]
+
+cv2.imwrite(rospkg.RosPack().get_path('obj_tracking') + '/data/calibresult.png', dst)
+
+with open(rospkg.RosPack().get_path('obj_tracking') + '/data/calib_mtx_dist.pkl', 'wb') as handle:
+    pickle.dump([mtx, newcameramtx, dist, rvecs, tvecs], handle)
 
 print("Camera matrix : \n")
 print(mtx)

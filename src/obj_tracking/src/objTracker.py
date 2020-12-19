@@ -5,6 +5,7 @@ import rospy
 import pickle
 import tf2_ros
 import cv2, PIL
+import rospkg
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -19,19 +20,17 @@ from sensor_msgs.msg import (
 )
 
 def track_aruco(message):
-    with open('./src/aruco_pkg/data/calib_mtx_dist.pkl', 'rb') as handle:
-        mtx, dist = pickle.load(handle)
+    with open(rospkg.RosPack().get_path('obj_tracking') + '/data/calib_mtx_dist.pkl', 'rb') as handle:
+        mtx, newcameramtx, dist, rvecs, tvecs = pickle.load(handle)
 
     bridge = CvBridge()
     img = bridge.imgmsg_to_cv2(message, desired_encoding='passthrough')
 
+
     h, w = img.shape[:2]
-    newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
     # undistort
-    dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
-    x,y,w,h = roi
-    frame = dst[y:y+h, x:x+w]
+    frame = cv2.undistort(img, mtx, dist, None, newcameramtx)
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
@@ -43,7 +42,15 @@ def track_aruco(message):
         # Estimate the posture per each Aruco marker
         rotation_vectors, translation_vectors, _objPoints = aruco.estimatePoseSingleMarkers(corners, 1, mtx, dist)
         
-        frame_markers = aruco.drawAxis(frame_markers, mtx, dist, rotation_vectors[0], translation_vectors[0], 1)
+        for rvec, tvec in zip(rotation_vectors, translation_vectors):
+            frame_markers = aruco.drawAxis(frame_markers, mtx, dist, rvec, tvec, 1)
+            x = tvec[0][0] * -0.01653 # Experimentally determined values
+            y = tvec[0][2] * 0.01167
+            z = tvec[0][1] * 0.02433
+            print("x: {} y: {} z: {}".format(x, y, z))
+    
+        # cv2.imshow("Labelled", frame_markers)
+        # cv2.waitKey(0)
 
         # we need a homogeneous matrix but OpenCV only gives us a 3x3 rotation matrix
         rotation_matrix = np.array([[0, 0, 0, 0],
@@ -61,12 +68,12 @@ def track_aruco(message):
         tf2Stamp.header.stamp = rospy.Time.now()
         tf2Stamp.header.frame_id = 'link_camera'
         tf2Stamp.child_frame_id = 'tracked_object'
-        tf2Stamp.transform.translation.x, tf2Stamp.transform.translation.y, tf2Stamp.transform.translation.z = translation_vectors[0][0]
+        tf2Stamp.transform.translation.x, tf2Stamp.transform.translation.y, tf2Stamp.transform.translation.z = x, y, z
         tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = quaternion
         tf2Broadcast.sendTransform(tf2Stamp)
 
 if __name__ == '__main__':
     tf2Broadcast = tf2_ros.TransformBroadcaster()
     rospy.init_node("obj_tracker")
-    sub = rospy.Subscriber("subject_image_raw", Image, track_aruco)
+    sub = rospy.Subscriber("image_raw", Image, track_aruco)
     rospy.spin()
