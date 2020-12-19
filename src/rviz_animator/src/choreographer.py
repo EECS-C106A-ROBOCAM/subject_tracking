@@ -7,6 +7,7 @@ import PyKDL
 import rospy
 import rospkg
 import tf2_ros
+import threading
 import warnings
 import traceback
 import numpy as np
@@ -25,7 +26,8 @@ from tf2_geometry_msgs import do_transform_pose
 from geometry_msgs.msg import (    
 	Point,
 	Quaternion,
-	Pose,
+    Pose,
+	PoseArray,
     PoseStamped,
     Transform
 )
@@ -43,6 +45,11 @@ from ik_solver.srv import (
 def createSequence(keyframes, dt=0.1):
     timestamps = [frame.timestamp for frame in keyframes]
     rotations = quaternion.as_quat_array([[frame.frame.orientation.x, frame.frame.orientation.y, frame.frame.orientation.z, frame.frame.orientation.w] for frame in keyframes])
+
+    # Coordinate frame conversion
+    multiplier_quat = quaternion.from_float_array([np.sqrt(2) / 2, -np.sqrt(2) / 2, 0, 0])
+    rotations = [rot * multiplier_quat for rot in rotations]
+
     positions = np.array([[frame.frame.position.x, frame.frame.position.y, frame.frame.position.z] for frame in keyframes])
 
     time_interps = list(np.arange(timestamps[0], timestamps[-1], dt)) + [timestamps[-1]]
@@ -62,9 +69,16 @@ def createSequence(keyframes, dt=0.1):
         pose_stamped = PoseStamped()
         pose_stamped.pose = pose
         sequence.append(pose_stamped)
+
+
+    g_poses[0] = sequence[-1].pose
+    g_poses[1] = sequence[-1].pose
+
     return time_interps, sequence 
 
 def callback(message):
+    global g_joint_angles
+
     time_interps, sequence = createSequence(message.keyframes)    
 
     print("Getting reference frames...")
@@ -80,11 +94,6 @@ def callback(message):
     
     print("Beginning playback...")
     start = time.time()
-    target_joints = None
-    current_joints = JointState()
-    current_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
-    current_joints.header.stamp = rospy.Time.now()
-    current_joints.position = [0.1] * 6
     for t, pose in zip(time_interps, sequence):
         while time.time() - start < t:
             continue
@@ -100,42 +109,47 @@ def callback(message):
         # target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w = quaternion_multiply(quat_rot, [target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w])
         try:
             solve_ik = rospy.ServiceProxy('solve_ik', SolveIKSrv)
-            print(target_pose)
+            # print(target_pose)
             response = solve_ik(target_pose)
-            target_joints = response.output_joints
-            current_joints = target_joints
+            if response.solved:
+                g_joint_angles = response.output_joints.position
+                print("Setting joint state: {}".format(g_joint_angles))
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
-
-        if target_joints is not None:
-            publish_joints = JointState()
-            publish_joints.position = target_joints.position
-            publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
-            publish_joints.header.stamp = rospy.Time.now()
-            pub_rviz.publish(publish_joints)
             
     print("Finished playback.")
 
+def joint_publisher():
+    rate = rospy.Rate(5)
+    while not rospy.is_shutdown():
+        publish_joints = JointState()
+        publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+        publish_joints.position = g_joint_angles
+        publish_joints.header.stamp = rospy.Time.now()
+        pub_joints.publish(publish_joints)
+
+        poseArray = PoseArray()
+        poseArray.header.stamp = rospy.Time.now()
+        poseArray.header.frame_id = "world"
+        poseArray.poses = g_poses
+        pub_rviz.publish(poseArray)
+        rate.sleep()
+
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
-    pub_rviz = rospy.Publisher('joint_states', JointState, queue_size=10)
+    pub_joints = rospy.Publisher('joint_states', JointState, queue_size=10)
+    g_joint_angles = [0] * 6
+
+    pub_rviz = rospy.Publisher('target_poses', PoseArray, queue_size=10)
+    g_poses = [Pose(), Pose()] 
+
+    joint_pub_thread = threading.Thread(target=joint_publisher)
+    joint_pub_thread.start()
 
     print("Waiting for IK service...")
     rospy.wait_for_service('solve_ik')
 
-    print("Listening for keyframes...")
-    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
-
-    rate = rospy.Rate(5)
-    start = time.time()
-    while time.time() - start < 5:
-        publish_joints = JointState()
-        publish_joints.position = [0] * 6
-        publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
-        publish_joints.header.stamp = rospy.Time.now()
-        pub_rviz.publish(publish_joints)
-        rate.sleep()
-
     print("Ready for keyframes!")
+    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
 
     rospy.spin()

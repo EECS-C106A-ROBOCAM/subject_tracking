@@ -63,17 +63,24 @@ def track_aruco(message):
         # convert the matrix to a quaternion
         quaternion = tf.transformations.quaternion_from_matrix(rotation_matrix)
 
+        _, quat = tf_listener.lookupTransform('link_camera', 'world', rospy.Time(0))
+        
         #broadcast frame
         tf2Stamp = TransformStamped()
         tf2Stamp.header.stamp = rospy.Time.now()
         tf2Stamp.header.frame_id = 'link_camera'
-        tf2Stamp.child_frame_id = 'tracked_object'
+        tf2Stamp.child_frame_id = 'tracked_object_camera'
         tf2Stamp.transform.translation.x, tf2Stamp.transform.translation.y, tf2Stamp.transform.translation.z = x, y, z
-        tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = 0, 0, -np.sqrt(2) / 2, np.sqrt(2) / 2
+        tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = quat #0, 0, np.sqrt(2) / 2, np.sqrt(2) / 2
         tf2Broadcast.sendTransform(tf2Stamp)
 
 if __name__ == '__main__':
-    tf2Broadcast = tf2_ros.TransformBroadcaster()
     rospy.init_node("obj_tracker")
     sub = rospy.Subscriber("image_raw", Image, track_aruco)
+
+    tf_listener = tf.TransformListener()
+    tf2Broadcast = tf2_ros.TransformBroadcaster()
+
+    tf_listener.waitForTransform("world", "link_camera", rospy.Time(), rospy.Duration(10.0))
+
     rospy.spin()

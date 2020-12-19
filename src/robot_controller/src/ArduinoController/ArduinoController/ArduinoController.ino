@@ -132,7 +132,7 @@ void motorCallback(const std_msgs::Float32MultiArray& floatArrayMsg) {
   }
 
   nh.loginfo("Moving motors now!");
-  glide(motorAngles, 250);
+  glide(motorAngles, 100);
 }
 
 ros::Subscriber<std_msgs::Float32MultiArray> sub(ROS_TOPIC_NAME, motorCallback);

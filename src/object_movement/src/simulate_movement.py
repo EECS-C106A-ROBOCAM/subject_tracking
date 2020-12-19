@@ -23,7 +23,7 @@ def register_frame(pose):
     tf2Stamp.transform.rotation.x, tf2Stamp.transform.rotation.y, tf2Stamp.transform.rotation.z, tf2Stamp.transform.rotation.w = pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w
     tf2Broadcast.sendTransform(tf2Stamp)
 
-def simulate_movement(reference_frame="world", max_speed=1, refresh_rate=30, update_rate=1, x_min=-0.2, y_min=-0.2, x_max=0.2, y_max=0.2):
+def simulate_movement(reference_frame="world", max_speed=0.0, refresh_rate=30, update_rate=1, x_min=-0.05, y_min=-0.05, x_max=0.05, y_max=0.05):
     rate = rospy.Rate(refresh_rate)
     try:
         curr_pose, speed, theta = Pose(), 0, 0

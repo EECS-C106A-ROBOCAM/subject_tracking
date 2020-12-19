@@ -8,6 +8,8 @@ import rospkg
 import numpy as np
 import kdl_parser_py.urdf as parser
 
+from urdf_parser_py.urdf import URDF
+
 from tf_conversions import posemath
 from tf.transformations import euler_from_quaternion
 
@@ -58,7 +60,11 @@ class Plotter:
 
 def callback(req):
     targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
-    return SolveIKSrvResponse(solveIK(targetFrame))
+    solved, jointState = solveIK(targetFrame) 
+    ret = SolveIKSrvResponse()
+    ret.solved = solved
+    ret.output_joints = jointState
+    return ret
 
 
 def solveIK(targetFrame):
@@ -196,7 +202,17 @@ def solveIK(targetFrame):
     # print("J1: {} J5: {}".format(J1, J5))
 
     jointAngles = [J1, J2, J3, J4, J5, J6]
+    jointNames = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+
     print("\n\nFinal joint angles in radians: {}\n\n".format(jointAngles))
+
+    in_bounds = True
+    for angle, name in zip(jointAngles, jointNames):
+        limit = robot_urdf.joint_map[name].limit
+        if angle < limit.lower or angle > limit.upper:
+            in_bounds = False
+            print("Joint {} out of bounds with angle {} not between {} and {}".format(name, angle, limit.lower, limit.upper))
+    print("All in bounds: {}".format(in_bounds))        
 
     solvedJoints = PyKDL.JntArray(8)
     solvedJoints[0], solvedJoints[1], solvedJoints[3], solvedJoints[5], solvedJoints[6], solvedJoints[7] = jointAngles
@@ -224,7 +240,7 @@ def solveIK(targetFrame):
     plotter.addGoal(ret)
     # plotter.publish()
 
-    return ret
+    return in_bounds, ret
 
 
 def testIK():
@@ -246,6 +262,8 @@ def testIK():
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
     s = rospy.Service("solve_ik", SolveIKSrv, callback)
+
+    robot_urdf = URDF.from_parameter_server()
 
     # pub_orange = rospy.Publisher("orange_pub", PointStamped, queue_size=10)
     # pub_pink = rospy.Publisher("pink_pub", PoseStamped, queue_size=10)
