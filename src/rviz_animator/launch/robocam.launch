@@ -6,13 +6,15 @@
 
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 -0.3 0 0 0 0 1 world base" />
 
-    <!-- <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
         <param name="use_gui" value="true"/>
-    </node> -->
+    </node>
     
     <node pkg="aruco_pkg" type="arucoTracker.py" name="arucoTracker" output="screen"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rviz_animator)/rviz/robocam.rviz" />
     <node pkg="ik_solver" type="CustomIKSolver.py" name="ik_service" output="screen"/>
     <node pkg="rviz_animator" type="choreographer.py" name="choreographer" output="screen"/>
+    <node pkg="robot_controller" type="robot_controller.py" name="robot_controller" />
+    
 
 </launch>

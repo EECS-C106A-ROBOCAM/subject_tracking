@@ -32,6 +32,9 @@ from geometry_msgs.msg import (
 from sensor_msgs.msg import (
     JointState
 )
+from std_msgs.msg import (
+    Float32MultiArray
+)
 
 from ik_solver.srv import (
     SolveIKSrv
@@ -109,20 +112,30 @@ def callback(message):
             publish_joints.position = target_joints.position
             publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
             publish_joints.header.stamp = rospy.Time.now()
-            pub_robot.publish(publish_joints)
+            pub_rviz.publish(publish_joints)
             
-        pub.publish(target_pose)
-
     print("Finished playback.")
 
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
-    pub = rospy.Publisher('rviz_poses', PoseStamped, queue_size=10)
-    pub_robot = rospy.Publisher('joint_states', JointState, queue_size=10)
+    pub_rviz = rospy.Publisher('joint_states', JointState, queue_size=10)
+
     print("Waiting for IK service...")
     rospy.wait_for_service('solve_ik')
 
     print("Listening for keyframes...")
     rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
+
+    rate = rospy.Rate(5)
+    start = time.time()
+    while time.time() - start < 5:
+        publish_joints = JointState()
+        publish_joints.position = [0] * 6
+        publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+        publish_joints.header.stamp = rospy.Time.now()
+        pub_rviz.publish(publish_joints)
+        rate.sleep()
+
+    print("Ready for keyframes!")
 
     rospy.spin()
