@@ -56,6 +56,7 @@ class Plotter:
 
 def callback(req):
     targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
+    return SolveIKSrv(solveIK(targetFrame))
 
 
 def solveIK(targetFrame):
@@ -292,14 +293,15 @@ def testIK():
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
     s = rospy.Service("solve_ik", SolveIKSrv, callback)
-    pub_orange = rospy.Publisher("orange_pub", PointStamped, queue_size=10)
-    pub_pink = rospy.Publisher("pink_pub", PoseStamped, queue_size=10)
-    pub_brown = rospy.Publisher("brown_pub", PointStamped, queue_size=10)
-    pub_purple = rospy.Publisher("purple_pub", PointStamped, queue_size=10)
 
-    pub_array = []
+    # pub_orange = rospy.Publisher("orange_pub", PointStamped, queue_size=10)
+    # pub_pink = rospy.Publisher("pink_pub", PoseStamped, queue_size=10)
+    # pub_brown = rospy.Publisher("brown_pub", PointStamped, queue_size=10)
+    # pub_purple = rospy.Publisher("purple_pub", PointStamped, queue_size=10)
+
+    # pub_array = []
     
-    testIK()
+    # testIK()
 
     print("Listening for IK requests...")
     rospy.spin()

@@ -288,7 +288,6 @@
         <axis xyz="0 0 1" />
         <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
     </joint>
-
   
     <joint name="joint_rot_1" type="revolute">
         <parent link="link_rot"/>
