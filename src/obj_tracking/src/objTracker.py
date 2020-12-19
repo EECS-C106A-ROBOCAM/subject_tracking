@@ -80,7 +80,6 @@ if __name__ == '__main__':
 
     tf_listener = tf.TransformListener()
     tf2Broadcast = tf2_ros.TransformBroadcaster()
-
     tf_listener.waitForTransform("world", "link_camera", rospy.Time(), rospy.Duration(10.0))
 
     rospy.spin()

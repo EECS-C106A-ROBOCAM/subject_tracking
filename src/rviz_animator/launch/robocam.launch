@@ -15,6 +15,5 @@
     <node pkg="ik_solver" type="CustomIKSolver.py" name="ik_service" output="screen"/>
     <node pkg="obj_tracking" type="objTracker.py" name="objTracker"/>
     <node pkg="robot_controller" type="robot_controller.py" name="robot_controller" />
-    
 
 </launch>

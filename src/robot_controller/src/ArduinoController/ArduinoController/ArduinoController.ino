@@ -130,7 +130,6 @@ void motorCallback(const std_msgs::Float32MultiArray& floatArrayMsg) {
     nh.logerror("Motors out of range!");
     return;
   }
-
   nh.loginfo("Moving motors now!");
   glide(motorAngles, 100);
 }

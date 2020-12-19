@@ -137,6 +137,7 @@ def joint_publisher():
 
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
+    
     pub_joints = rospy.Publisher('joint_states', JointState, queue_size=10)
     g_joint_angles = [0] * 6
 

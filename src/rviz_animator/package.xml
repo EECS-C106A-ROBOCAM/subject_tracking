@@ -1,4 +1,5 @@
 <package>
+
   <name>rviz_animator</name>
   <version>0.11.0</version>
   <description>
@@ -28,4 +29,5 @@
       <rosdoc config="${prefix}/rosdoc.yaml"/>
       <rviz plugin="${prefix}/plugin_description.xml"/>
   </export>
+
 </package>

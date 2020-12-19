@@ -1,4 +1,5 @@
 geometry_msgs/PoseStamped input_pose
 ---
+
 bool solved
 sensor_msgs/JointState output_joints

@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <robot name="robocam">
-
     <!-- Robot Links -->
     <link name="base">
         <visual>

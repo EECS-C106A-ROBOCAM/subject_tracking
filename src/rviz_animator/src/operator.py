@@ -31,7 +31,6 @@ def talker():
       
 if __name__ == '__main__':
   rospy.init_node('operator', anonymous=True)
-  
   try:
     talker()
   except rospy.ROSInterruptException: pass
