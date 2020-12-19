@@ -7,7 +7,7 @@
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 0 0 0 0 0 1 world base" />
 
     <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
-        <param name="use_gui" value="true"/>
+        <!-- <param name="use_gui" value="true"/> -->
     </node>
 
 

@@ -284,7 +284,7 @@
     <joint name="joint_base_rot" type="revolute">
         <parent link="base"/>
         <child link="link_rot"/>
-        <origin xyz="0 0 .07" rpy="0 0 0" />
+        <origin xyz="0 0 .14" rpy="0 0 0" />
         <axis xyz="0 0 1" />
         <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
     </joint>
@@ -293,7 +293,7 @@
     <joint name="joint_rot_1" type="revolute">
         <parent link="link_rot"/>
         <child link="link_1"/>
-        <origin xyz="0 0.012 .041" rpy="0 0 0" />
+        <origin xyz="0 0.024 .082" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-.3927" upper="0.3927" velocity="1000"/>
     </joint>
@@ -301,7 +301,7 @@
     <joint name="joint_rot_1_mimic" type="revolute">
         <parent link="link_rot"/>
         <child link="link_1_mimic"/>
-        <origin xyz="0 -0.012 .07" rpy="0 0 0" />
+        <origin xyz="0 -0.024 .14" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-.3927" upper="0.3927" velocity="1000"/>
         <mimic joint="joint_rot_1" multiplier="1" offset="0"/>
@@ -310,7 +310,7 @@
     <joint name="joint_1_f1" type="continuous">
         <parent link="link_1"/>
         <child link="link_f1"/>
-        <origin xyz="0 0 .336" rpy="-0.5470 0 0" />
+        <origin xyz="0 0 .672" rpy="-0.5470 0 0" />
         <axis xyz="1 0 0" />
         <mimic joint="joint_rot_1" multiplier="-1" offset="0"/>
     </joint>
@@ -318,7 +318,7 @@
     <joint name="joint_f1_2" type="revolute">
         <parent link="link_f1"/>
         <child link="link_2"/>
-        <origin xyz="0 0 0.0374" rpy="0 0 0" />
+        <origin xyz="0 0 0.0748" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-.3927" upper=".3927" velocity="1000"/>
     </joint>
@@ -326,7 +326,7 @@
     <joint name="joint_f1_2_mimic" type="continuous">
         <parent link="link_f1"/>
         <child link="link_2_mimic"/>
-        <origin xyz="0 0.02 0.0174" rpy="0 0 0" />
+        <origin xyz="0 0.04 0.0348" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <mimic joint="joint_f1_2" multiplier="1" offset="0"/>
     </joint>
@@ -334,7 +334,7 @@
     <joint name="joint_2_f2" type="continuous">
         <parent link="link_2"/>
         <child link="link_f2"/>
-        <origin xyz="0 0.34 0" rpy="0 0 0" />
+        <origin xyz="0 0.68 0" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <mimic joint="joint_f1_2" multiplier="-1" offset="0"/>
     </joint>
@@ -342,7 +342,7 @@
     <joint name="joint_f2_pitch" type="revolute">
         <parent link="link_f2"/>
         <child link="link_pitch"/>
-        <origin xyz="0 0.0464 0" rpy="0 0 0" />
+        <origin xyz="0 0.0928 0" rpy="0 0 0" />
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
     </joint>
@@ -350,7 +350,7 @@
     <joint name="joint_pitch_yaw" type="revolute">
         <parent link="link_pitch"/>
         <child link="link_yaw"/>
-        <origin xyz="0 0.039 0.013" rpy="0 0 0" />
+        <origin xyz="0 0.078 0.026" rpy="0 0 0" />
         <axis xyz="0 0 1" />
         <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
     </joint>
@@ -358,7 +358,7 @@
     <joint name="joint_yaw_roll" type="revolute">
         <parent link="link_yaw"/>
         <child link="link_roll"/>
-        <origin xyz="0 0.021 0.017" rpy="0 0 0" />
+        <origin xyz="0 0.042 0.034" rpy="0 0 0" />
         <axis xyz="0 1 0" />
         <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="1000"/>
     </joint>
@@ -366,7 +366,7 @@
     <joint name="joint_roll_camera" type="fixed">
         <parent link="link_roll"/>
         <child link="link_camera"/>
-        <origin xyz="0 0.008 0.024" rpy="0 0 0" />
+        <origin xyz="0 0.016 0.048" rpy="0 0 0" />
     </joint>
 
 </robot>
