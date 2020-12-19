@@ -1,23 +1,38 @@
 #!/usr/bin/env python
 
-import rospy
 import sys
+import time
+import PyKDL
 import rospy
+import rospkg
 import tf2_ros
+import warnings
 import traceback
 import numpy as np
-import quaternion
-import time
+import kdl_parser_py.urdf as parser
+from urdf_parser_py.urdf import URDF
 
+warnings.filterwarnings('ignore', category=UserWarning)
+import quaternion
+
+from tf_conversions import posemath
 from scipy.interpolate import interp1d
-from tf2_geometry_msgs import do_transform_pose
+
 from rviz_animator.msg import KeyframesMsg
+from tf2_geometry_msgs import do_transform_pose
 from geometry_msgs.msg import (    
 	Point,
 	Quaternion,
 	Pose,
     PoseStamped,
     Transform
+)
+from sensor_msgs.msg import (
+    JointState
+)
+
+from ik_solver.srv import (
+    SolveIK
 )
 
 def createSequence(keyframes, dt=0.1):
@@ -45,49 +60,64 @@ def createSequence(keyframes, dt=0.1):
     return time_interps, sequence 
 
 def callback(message):
-    time_interps, sequence = createSequence(message.keyframes)
+    time_interps, sequence = createSequence(message.keyframes)    
 
+    print("Getting reference frames...")
     tf_buffer = tf2_ros.Buffer(rospy.Duration(1200))
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
-    print("Acquiring reference frames...")
     transform_object_to_base = None
     while not transform_object_to_base:
         try:
-            transform_object_to_base = tf_buffer.lookup_transform('world', 'tracked_object', rospy.Time(0))
+            transform_object_to_base = tf_buffer.lookup_transform('base', 'tracked_object', rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             continue
     
     print("Beginning playback...")
     start = time.time()
+    target_joints = None
+    current_joints = JointState()
+    current_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+    current_joints.header.stamp = rospy.Time.now()
+    current_joints.position = [0.1] * 6
     for t, pose in zip(time_interps, sequence):
         while time.time() - start < t:
             continue
         
         try:
-            transform_object_to_base = tf_buffer.lookup_transform('world', 'tracked_object', rospy.Time(0))
+            transform_object_to_base = tf_buffer.lookup_transform('base', 'tracked_object', rospy.Time(0))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             print("Failed to get object to base transform at timestep {} | Real Time: {}".format(t, time.time() - start))
             continue
 
         target_pose = do_transform_pose(pose, transform_object_to_base)
+        try:
+            solve_ik = rospy.ServiceProxy('solve_ik', SolveIK)
+            response = solve_ik(target_pose, current_joints)
+            target_joints = response.output_joints
+            current_joints = target_joints
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
+
+        if target_joints is not None:
+            publish_joints = JointState()
+            publish_joints.position = target_joints.position
+            publish_joints.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
+            publish_joints.header.stamp = rospy.Time.now()
+            pub_robot.publish(publish_joints)
+            
         pub.publish(target_pose)
-        # do ik and get joint angles
 
-        # send to arduino
-    print("Finished playback...")
+    print("Finished playback.")
 
-def listener():
-    print("Listening for keyframes...")
-    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
-
-    #Wait for messages to arrive on the subscribed topics, and exit the node
-    #when it is killed with Ctrl+C
-    rospy.spin()
-
-#Python's syntax for a main() method
 if __name__ == '__main__':
     rospy.init_node('choreographer', anonymous=True)
     pub = rospy.Publisher('rviz_poses', PoseStamped, queue_size=10)
+    pub_robot = rospy.Publisher('joint_states', JointState, queue_size=10)
+    print("Waiting for IK service...")
+    rospy.wait_for_service('solve_ik')
 
-    listener()
+    print("Listening for keyframes...")
+    rospy.Subscriber("operator_keyframes", KeyframesMsg, callback)
+
+    rospy.spin()

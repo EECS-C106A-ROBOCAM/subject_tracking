@@ -1,0 +1,2382 @@
+Help on module PyKDL:
+
+NAME
+    PyKDL
+
+FILE
+    /opt/ros/kinetic/lib/python2.7/dist-packages/PyKDL.so
+
+CLASSES
+    sip.wrapper(sip.simplewrapper)
+        Chain
+        ChainDynParam
+        ChainFkSolverPos
+            ChainFkSolverPos_recursive
+        ChainFkSolverVel
+            ChainFkSolverVel_recursive
+        ChainIkSolverPos
+            ChainIkSolverPos_LMA
+            ChainIkSolverPos_NR
+            ChainIkSolverPos_NR_JL
+        ChainIkSolverVel
+            ChainIkSolverVel_pinv
+            ChainIkSolverVel_pinv_givens
+            ChainIkSolverVel_pinv_nso
+            ChainIkSolverVel_wdls
+        ChainJntToJacSolver
+        Frame
+        FrameVel
+        Jacobian
+        JntArray
+        JntArrayVel
+        JntSpaceInertiaMatrix
+        Joint
+        RigidBodyInertia
+        Rotation
+        RotationVel
+        RotationalInertia
+        Segment
+        Tree
+        Twist
+        TwistVel
+        Vector
+        VectorVel
+        Wrench
+        doubleVel
+    
+    class Chain(sip.wrapper)
+     |  Chain()
+     |  Chain(Chain)
+     |  
+     |  Method resolution order:
+     |      Chain
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  addChain(...)
+     |      Chain.addChain(Chain)
+     |  
+     |  addSegment(...)
+     |      Chain.addSegment(Segment)
+     |  
+     |  getNrOfJoints(...)
+     |      Chain.getNrOfJoints() -> int
+     |  
+     |  getNrOfSegments(...)
+     |      Chain.getNrOfSegments() -> int
+     |  
+     |  getSegment(...)
+     |      Chain.getSegment(int) -> Segment
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainDynParam(sip.wrapper)
+     |  ChainDynParam(Chain, Vector)
+     |  ChainDynParam(ChainDynParam)
+     |  
+     |  Method resolution order:
+     |      ChainDynParam
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  JntToCoriolis(...)
+     |      ChainDynParam.JntToCoriolis(JntArray, JntArray, JntArray) -> int
+     |  
+     |  JntToGravity(...)
+     |      ChainDynParam.JntToGravity(JntArray, JntArray) -> int
+     |  
+     |  JntToMass(...)
+     |      ChainDynParam.JntToMass(JntArray, JntSpaceInertiaMatrix) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainFkSolverPos(sip.wrapper)
+     |  Method resolution order:
+     |      ChainFkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainFkSolverPos_recursive(ChainFkSolverPos)
+     |  ChainFkSolverPos_recursive(Chain)
+     |  ChainFkSolverPos_recursive(ChainFkSolverPos_recursive)
+     |  
+     |  Method resolution order:
+     |      ChainFkSolverPos_recursive
+     |      ChainFkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  JntToCart(...)
+     |      ChainFkSolverPos_recursive.JntToCart(JntArray, Frame, int segmentNr=-1) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainFkSolverPos:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainFkSolverVel(sip.wrapper)
+     |  Method resolution order:
+     |      ChainFkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainFkSolverVel_recursive(ChainFkSolverVel)
+     |  ChainFkSolverVel_recursive(Chain)
+     |  ChainFkSolverVel_recursive(ChainFkSolverVel_recursive)
+     |  
+     |  Method resolution order:
+     |      ChainFkSolverVel_recursive
+     |      ChainFkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  JntToCart(...)
+     |      ChainFkSolverVel_recursive.JntToCart(JntArrayVel, FrameVel, int segmentNr=-1) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainFkSolverVel:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverPos(sip.wrapper)
+     |  ChainIkSolverPos()
+     |  ChainIkSolverPos(ChainIkSolverPos)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverPos.CartToJnt(JntArray, Frame, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverPos_LMA(ChainIkSolverPos)
+     |  ChainIkSolverPos_LMA(Chain, float eps=1e-05, int _maxiter=500, float _eps_joints=1e-15)
+     |  ChainIkSolverPos_LMA(ChainIkSolverPos_LMA)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverPos_LMA
+     |      ChainIkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverPos_LMA.CartToJnt(JntArray, Frame, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverPos:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverPos_NR(ChainIkSolverPos)
+     |  ChainIkSolverPos_NR(Chain, ChainFkSolverPos, ChainIkSolverVel, int maxiter=100, float eps=epsilon)
+     |  ChainIkSolverPos_NR(ChainIkSolverPos_NR)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverPos_NR
+     |      ChainIkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverPos_NR.CartToJnt(JntArray, Frame, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverPos:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverPos_NR_JL(ChainIkSolverPos)
+     |  ChainIkSolverPos_NR_JL(Chain, JntArray, JntArray, ChainFkSolverPos, ChainIkSolverVel, int maxiter=100, float eps=epsilon)
+     |  ChainIkSolverPos_NR_JL(ChainIkSolverPos_NR_JL)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverPos_NR_JL
+     |      ChainIkSolverPos
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverPos_NR_JL.CartToJnt(JntArray, Frame, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverPos:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverVel(sip.wrapper)
+     |  ChainIkSolverVel()
+     |  ChainIkSolverVel(ChainIkSolverVel)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverVel.CartToJnt(JntArray, Twist, JntArray) -> int
+     |      ChainIkSolverVel.CartToJnt(JntArray, FrameVel, JntArrayVel) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverVel_pinv(ChainIkSolverVel)
+     |  ChainIkSolverVel_pinv(Chain, float eps=1e-05, int maxiter=150)
+     |  ChainIkSolverVel_pinv(ChainIkSolverVel_pinv)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverVel_pinv
+     |      ChainIkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverVel_pinv.CartToJnt(JntArray, Twist, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverVel:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverVel_pinv_givens(ChainIkSolverVel)
+     |  ChainIkSolverVel_pinv_givens(Chain)
+     |  ChainIkSolverVel_pinv_givens(ChainIkSolverVel_pinv_givens)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverVel_pinv_givens
+     |      ChainIkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverVel_pinv_givens.CartToJnt(JntArray, Twist, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverVel:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverVel_pinv_nso(ChainIkSolverVel)
+     |  ChainIkSolverVel_pinv_nso(Chain, float eps=1e-05, int maxiter=150, float alpha=0.25)
+     |  ChainIkSolverVel_pinv_nso(ChainIkSolverVel_pinv_nso)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverVel_pinv_nso
+     |      ChainIkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverVel_pinv_nso.CartToJnt(JntArray, Twist, JntArray) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverVel:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainIkSolverVel_wdls(ChainIkSolverVel)
+     |  ChainIkSolverVel_wdls(Chain, float eps=1e-05, int maxiter=150)
+     |  ChainIkSolverVel_wdls(ChainIkSolverVel_wdls)
+     |  
+     |  Method resolution order:
+     |      ChainIkSolverVel_wdls
+     |      ChainIkSolverVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  CartToJnt(...)
+     |      ChainIkSolverVel_wdls.CartToJnt(JntArray, Twist, JntArray) -> int
+     |  
+     |  setLambda(...)
+     |      ChainIkSolverVel_wdls.setLambda(float)
+     |  
+     |  setWeightJS(...)
+     |      ChainIkSolverVel_wdls.setWeightJS(list)
+     |  
+     |  setWeightTS(...)
+     |      ChainIkSolverVel_wdls.setWeightTS(list)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from ChainIkSolverVel:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class ChainJntToJacSolver(sip.wrapper)
+     |  ChainJntToJacSolver(Chain)
+     |  ChainJntToJacSolver(ChainJntToJacSolver)
+     |  
+     |  Method resolution order:
+     |      ChainJntToJacSolver
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  JntToJac(...)
+     |      ChainJntToJacSolver.JntToJac(JntArray, Jacobian) -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Frame(sip.wrapper)
+     |  Frame(Rotation, Vector)
+     |  Frame(Vector)
+     |  Frame(Rotation)
+     |  Frame()
+     |  Frame(Frame)
+     |  
+     |  Method resolution order:
+     |      Frame
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  DH(...)
+     |      Frame.DH(float, float, float, float) -> Frame
+     |  
+     |  DH_Craig1989(...)
+     |      Frame.DH_Craig1989(float, float, float, float) -> Frame
+     |  
+     |  Identity(...)
+     |      Frame.Identity() -> Frame
+     |  
+     |  Integrate(...)
+     |      Frame.Integrate(Twist, float)
+     |  
+     |  Inverse(...)
+     |      Frame.Inverse() -> Frame
+     |      Frame.Inverse(Vector) -> Vector
+     |      Frame.Inverse(Wrench) -> Wrench
+     |      Frame.Inverse(Twist) -> Twist
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  M
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  p
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class FrameVel(sip.wrapper)
+     |  FrameVel()
+     |  FrameVel(Frame)
+     |  FrameVel(Frame, Twist)
+     |  FrameVel(RotationVel, VectorVel)
+     |  FrameVel(FrameVel)
+     |  
+     |  Method resolution order:
+     |      FrameVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  GetFrame(...)
+     |      FrameVel.GetFrame() -> Frame
+     |  
+     |  GetTwist(...)
+     |      FrameVel.GetTwist() -> Twist
+     |  
+     |  Identity(...)
+     |      FrameVel.Identity() -> FrameVel
+     |  
+     |  Inverse(...)
+     |      FrameVel.Inverse() -> FrameVel
+     |      FrameVel.Inverse(VectorVel) -> VectorVel
+     |      FrameVel.Inverse(Vector) -> VectorVel
+     |      FrameVel.Inverse(TwistVel) -> TwistVel
+     |      FrameVel.Inverse(Twist) -> TwistVel
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  deriv(...)
+     |      FrameVel.deriv() -> Twist
+     |  
+     |  value(...)
+     |      FrameVel.value() -> Frame
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  M
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  p
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Jacobian(sip.wrapper)
+     |  Jacobian(int)
+     |  Jacobian(Jacobian)
+     |  
+     |  Method resolution order:
+     |      Jacobian
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  changeBase(...)
+     |      Jacobian.changeBase(Rotation)
+     |  
+     |  changeRefFrame(...)
+     |      Jacobian.changeRefFrame(Frame)
+     |  
+     |  changeRefPoint(...)
+     |      Jacobian.changeRefPoint(Vector)
+     |  
+     |  columns(...)
+     |      Jacobian.columns() -> int
+     |  
+     |  getColumn(...)
+     |      Jacobian.getColumn(int) -> Twist
+     |  
+     |  resize(...)
+     |      Jacobian.resize(int)
+     |  
+     |  rows(...)
+     |      Jacobian.rows() -> int
+     |  
+     |  setColumn(...)
+     |      Jacobian.setColumn(int, Twist)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class JntArray(sip.wrapper)
+     |  JntArray(int)
+     |  JntArray(JntArray)
+     |  
+     |  Method resolution order:
+     |      JntArray
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  columns(...)
+     |      JntArray.columns() -> int
+     |  
+     |  resize(...)
+     |      JntArray.resize(int)
+     |  
+     |  rows(...)
+     |      JntArray.rows() -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class JntArrayVel(sip.wrapper)
+     |  JntArrayVel(int)
+     |  JntArrayVel(JntArray, JntArray)
+     |  JntArrayVel(JntArray)
+     |  JntArrayVel(JntArrayVel)
+     |  
+     |  Method resolution order:
+     |      JntArrayVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  deriv(...)
+     |      JntArrayVel.deriv() -> JntArray
+     |  
+     |  resize(...)
+     |      JntArrayVel.resize(int)
+     |  
+     |  value(...)
+     |      JntArrayVel.value() -> JntArray
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  q
+     |  
+     |  qdot
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class JntSpaceInertiaMatrix(sip.wrapper)
+     |  JntSpaceInertiaMatrix()
+     |  JntSpaceInertiaMatrix(int)
+     |  JntSpaceInertiaMatrix(JntSpaceInertiaMatrix)
+     |  
+     |  Method resolution order:
+     |      JntSpaceInertiaMatrix
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  columns(...)
+     |      JntSpaceInertiaMatrix.columns() -> int
+     |  
+     |  resize(...)
+     |      JntSpaceInertiaMatrix.resize(int)
+     |  
+     |  rows(...)
+     |      JntSpaceInertiaMatrix.rows() -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Joint(sip.wrapper)
+     |  Joint(string, Joint.JointType type=Joint.None, float scale=1, float offset=0, float inertia=0, float damping=0, float stiffness=0)
+     |  Joint(Joint.JointType type=Joint.None, float scale=1, float offset=0, float inertia=0, float damping=0, float stiffness=0)
+     |  Joint(string, Vector, Vector, Joint.JointType, float scale=1, float offset=0, float inertia=0, float damping=0, float stiffness=0)
+     |  Joint(Vector, Vector, Joint.JointType, float scale=1, float offset=0, float inertia=0, float damping=0, float stiffness=0)
+     |  Joint(Joint)
+     |  
+     |  Method resolution order:
+     |      Joint
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  JointAxis(...)
+     |      Joint.JointAxis() -> Vector
+     |  
+     |  JointOrigin(...)
+     |      Joint.JointOrigin() -> Vector
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  getName(...)
+     |      Joint.getName() -> string
+     |  
+     |  getType(...)
+     |      Joint.getType() -> Joint.JointType
+     |  
+     |  getTypeName(...)
+     |      Joint.getTypeName() -> string
+     |  
+     |  pose(...)
+     |      Joint.pose(float) -> Frame
+     |  
+     |  twist(...)
+     |      Joint.twist(float) -> Twist
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes defined here:
+     |  
+     |  JointType = <class 'PyKDL.JointType'>
+     |  
+     |  
+     |  None = 8
+     |  
+     |  RotAxis = 0
+     |  
+     |  RotX = 1
+     |  
+     |  RotY = 2
+     |  
+     |  RotZ = 3
+     |  
+     |  TransAxis = 4
+     |  
+     |  TransX = 5
+     |  
+     |  TransY = 6
+     |  
+     |  TransZ = 7
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class RigidBodyInertia(sip.wrapper)
+     |  RigidBodyInertia(float m=0, Vector oc=Vector.Zero(), RotationalInertia Ic=RotationalInertia.Zero())
+     |  RigidBodyInertia(RigidBodyInertia)
+     |  
+     |  Method resolution order:
+     |      RigidBodyInertia
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  RefPoint(...)
+     |      RigidBodyInertia.RefPoint(Vector) -> RigidBodyInertia
+     |  
+     |  Zero(...)
+     |      RigidBodyInertia.Zero() -> RigidBodyInertia
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  getCOG(...)
+     |      RigidBodyInertia.getCOG() -> Vector
+     |  
+     |  getMass(...)
+     |      RigidBodyInertia.getMass() -> float
+     |  
+     |  getRotationalInertia(...)
+     |      RigidBodyInertia.getRotationalInertia() -> RotationalInertia
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Rotation(sip.wrapper)
+     |  Rotation()
+     |  Rotation(float, float, float, float, float, float, float, float, float)
+     |  Rotation(Vector, Vector, Vector)
+     |  Rotation(Rotation)
+     |  
+     |  Method resolution order:
+     |      Rotation
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  DoRotX(...)
+     |      Rotation.DoRotX(float)
+     |  
+     |  DoRotY(...)
+     |      Rotation.DoRotY(float)
+     |  
+     |  DoRotZ(...)
+     |      Rotation.DoRotZ(float)
+     |  
+     |  EulerZYX(...)
+     |      Rotation.EulerZYX(float, float, float) -> Rotation
+     |  
+     |  EulerZYZ(...)
+     |      Rotation.EulerZYZ(float, float, float) -> Rotation
+     |  
+     |  GetEulerZYX(...)
+     |      Rotation.GetEulerZYX() -> (float, float, float)
+     |  
+     |  GetEulerZYZ(...)
+     |      Rotation.GetEulerZYZ() -> (float, float, float)
+     |  
+     |  GetQuaternion(...)
+     |      Rotation.GetQuaternion() -> (float, float, float, float)
+     |  
+     |  GetRPY(...)
+     |      Rotation.GetRPY() -> (float, float, float)
+     |  
+     |  GetRot(...)
+     |      Rotation.GetRot() -> Vector
+     |  
+     |  GetRotAngle(...)
+     |      Rotation.GetRotAngle(float eps=epsilon) -> (float, Vector)
+     |  
+     |  Identity(...)
+     |      Rotation.Identity() -> Rotation
+     |  
+     |  Inverse(...)
+     |      Rotation.Inverse() -> Rotation
+     |      Rotation.Inverse(Vector) -> Vector
+     |      Rotation.Inverse(Wrench) -> Wrench
+     |      Rotation.Inverse(Twist) -> Twist
+     |  
+     |  Quaternion(...)
+     |      Rotation.Quaternion(float, float, float, float) -> Rotation
+     |  
+     |  RPY(...)
+     |      Rotation.RPY(float, float, float) -> Rotation
+     |  
+     |  Rot(...)
+     |      Rotation.Rot(Vector, float) -> Rotation
+     |  
+     |  Rot2(...)
+     |      Rotation.Rot2(Vector, float) -> Rotation
+     |  
+     |  RotX(...)
+     |      Rotation.RotX(float) -> Rotation
+     |  
+     |  RotY(...)
+     |      Rotation.RotY(float) -> Rotation
+     |  
+     |  RotZ(...)
+     |      Rotation.RotZ(float) -> Rotation
+     |  
+     |  SetInverse(...)
+     |      Rotation.SetInverse()
+     |  
+     |  UnitX(...)
+     |      Rotation.UnitX() -> Vector
+     |      Rotation.UnitX(Vector)
+     |  
+     |  UnitY(...)
+     |      Rotation.UnitY() -> Vector
+     |      Rotation.UnitY(Vector)
+     |  
+     |  UnitZ(...)
+     |      Rotation.UnitZ() -> Vector
+     |      Rotation.UnitZ(Vector)
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class RotationVel(sip.wrapper)
+     |  RotationVel()
+     |  RotationVel(Rotation)
+     |  RotationVel(Rotation, Vector)
+     |  RotationVel(RotationVel)
+     |  
+     |  Method resolution order:
+     |      RotationVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  DoRotX(...)
+     |      RotationVel.DoRotX(doubleVel)
+     |  
+     |  DoRotY(...)
+     |      RotationVel.DoRotY(doubleVel)
+     |  
+     |  DoRotZ(...)
+     |      RotationVel.DoRotZ(doubleVel)
+     |  
+     |  Identity(...)
+     |      RotationVel.Identity() -> RotationVel
+     |  
+     |  Inverse(...)
+     |      RotationVel.Inverse() -> RotationVel
+     |      RotationVel.Inverse(VectorVel) -> VectorVel
+     |      RotationVel.Inverse(Vector) -> VectorVel
+     |      RotationVel.Inverse(TwistVel) -> TwistVel
+     |      RotationVel.Inverse(Twist) -> TwistVel
+     |  
+     |  Rot(...)
+     |      RotationVel.Rot(Vector, doubleVel) -> RotationVel
+     |  
+     |  Rot2(...)
+     |      RotationVel.Rot2(Vector, doubleVel) -> RotationVel
+     |  
+     |  RotX(...)
+     |      RotationVel.RotX(doubleVel) -> RotationVel
+     |  
+     |  RotY(...)
+     |      RotationVel.RotY(doubleVel) -> RotationVel
+     |  
+     |  RotZ(...)
+     |      RotationVel.RotZ(doubleVel) -> RotationVel
+     |  
+     |  UnitX(...)
+     |      RotationVel.UnitX() -> VectorVel
+     |  
+     |  UnitY(...)
+     |      RotationVel.UnitY() -> VectorVel
+     |  
+     |  UnitZ(...)
+     |      RotationVel.UnitZ() -> VectorVel
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  deriv(...)
+     |      RotationVel.deriv() -> Vector
+     |  
+     |  value(...)
+     |      RotationVel.value() -> Rotation
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  R
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  w
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class RotationalInertia(sip.wrapper)
+     |  RotationalInertia(float Ixx=0, float Iyy=0, float Izz=0, float Ixy=0, float Ixz=0, float Iyz=0)
+     |  RotationalInertia(RotationalInertia)
+     |  
+     |  Method resolution order:
+     |      RotationalInertia
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  Zero(...)
+     |      RotationalInertia.Zero() -> RotationalInertia
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Segment(sip.wrapper)
+     |  Segment(string, Joint joint=Joint(Joint.None), Frame f_tip=Frame.Identity(), RigidBodyInertia I=RigidBodyInertia.Zero())
+     |  Segment(Joint joint=Joint(Joint.None), Frame f_tip=Frame.Identity(), RigidBodyInertia I=RigidBodyInertia.Zero())
+     |  Segment(Segment)
+     |  
+     |  Method resolution order:
+     |      Segment
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  getFrameToTip(...)
+     |      Segment.getFrameToTip() -> Frame
+     |  
+     |  getInertia(...)
+     |      Segment.getInertia() -> RigidBodyInertia
+     |  
+     |  getJoint(...)
+     |      Segment.getJoint() -> Joint
+     |  
+     |  getName(...)
+     |      Segment.getName() -> string
+     |  
+     |  pose(...)
+     |      Segment.pose(float) -> Frame
+     |  
+     |  setInertia(...)
+     |      Segment.setInertia(RigidBodyInertia)
+     |  
+     |  twist(...)
+     |      Segment.twist(float, float) -> Twist
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Tree(sip.wrapper)
+     |  Tree(string root_name="root")
+     |  Tree(Tree)
+     |  
+     |  Method resolution order:
+     |      Tree
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  addSegment(...)
+     |      Tree.addSegment(Segment, string) -> bool
+     |  
+     |  getChain(...)
+     |      Tree.getChain(string, string) -> Chain
+     |  
+     |  getNrOfJoints(...)
+     |      Tree.getNrOfJoints() -> int
+     |  
+     |  getNrOfSegments(...)
+     |      Tree.getNrOfSegments() -> int
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Twist(sip.wrapper)
+     |  Twist()
+     |  Twist(Vector, Vector)
+     |  Twist(Twist)
+     |  
+     |  Method resolution order:
+     |      Twist
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  RefPoint(...)
+     |      Twist.RefPoint(Vector) -> Twist
+     |  
+     |  ReverseSign(...)
+     |      Twist.ReverseSign()
+     |  
+     |  Zero(...)
+     |      Twist.Zero() -> Twist
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __div__(...)
+     |      x.__div__(y) <==> x/y
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __iadd__(...)
+     |      x.__iadd__(y) <==> x+=y
+     |  
+     |  __isub__(...)
+     |      x.__isub__(y) <==> x-=y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __neg__(...)
+     |      x.__neg__() <==> -x
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rdiv__(...)
+     |      x.__rdiv__(y) <==> y/x
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __rsub__(...)
+     |      x.__rsub__(y) <==> y-x
+     |  
+     |  __rtruediv__(...)
+     |      x.__rtruediv__(y) <==> y/x
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  __sub__(...)
+     |      x.__sub__(y) <==> x-y
+     |  
+     |  __truediv__(...)
+     |      x.__truediv__(y) <==> x/y
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  rot
+     |  
+     |  vel
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class TwistVel(sip.wrapper)
+     |  TwistVel()
+     |  TwistVel(VectorVel, VectorVel)
+     |  TwistVel(Twist, Twist)
+     |  TwistVel(Twist)
+     |  TwistVel(TwistVel)
+     |  
+     |  Method resolution order:
+     |      TwistVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  GetTwist(...)
+     |      TwistVel.GetTwist() -> Twist
+     |  
+     |  GetTwistDot(...)
+     |      TwistVel.GetTwistDot() -> Twist
+     |  
+     |  RefPoint(...)
+     |      TwistVel.RefPoint(VectorVel) -> TwistVel
+     |  
+     |  ReverseSign(...)
+     |      TwistVel.ReverseSign()
+     |  
+     |  Zero(...)
+     |      TwistVel.Zero() -> TwistVel
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __div__(...)
+     |      x.__div__(y) <==> x/y
+     |  
+     |  __iadd__(...)
+     |      x.__iadd__(y) <==> x+=y
+     |  
+     |  __isub__(...)
+     |      x.__isub__(y) <==> x-=y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __neg__(...)
+     |      x.__neg__() <==> -x
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rdiv__(...)
+     |      x.__rdiv__(y) <==> y/x
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __rsub__(...)
+     |      x.__rsub__(y) <==> y-x
+     |  
+     |  __rtruediv__(...)
+     |      x.__rtruediv__(y) <==> y/x
+     |  
+     |  __sub__(...)
+     |      x.__sub__(y) <==> x-y
+     |  
+     |  __truediv__(...)
+     |      x.__truediv__(y) <==> x/y
+     |  
+     |  deriv(...)
+     |      TwistVel.deriv() -> Twist
+     |  
+     |  value(...)
+     |      TwistVel.value() -> Twist
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  rot
+     |  
+     |  vel
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Vector(sip.wrapper)
+     |  Vector()
+     |  Vector(float, float, float)
+     |  Vector(Vector)
+     |  
+     |  Method resolution order:
+     |      Vector
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  Norm(...)
+     |      Vector.Norm() -> float
+     |  
+     |  Normalize(...)
+     |      Vector.Normalize(float eps=epsilon) -> float
+     |  
+     |  ReverseSign(...)
+     |      Vector.ReverseSign()
+     |  
+     |  Zero(...)
+     |      Vector.Zero() -> Vector
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __div__(...)
+     |      x.__div__(y) <==> x/y
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __iadd__(...)
+     |      x.__iadd__(y) <==> x+=y
+     |  
+     |  __isub__(...)
+     |      x.__isub__(y) <==> x-=y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __neg__(...)
+     |      x.__neg__() <==> -x
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rdiv__(...)
+     |      x.__rdiv__(y) <==> y/x
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __rsub__(...)
+     |      x.__rsub__(y) <==> y-x
+     |  
+     |  __rtruediv__(...)
+     |      x.__rtruediv__(y) <==> y/x
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  __sub__(...)
+     |      x.__sub__(y) <==> x-y
+     |  
+     |  __truediv__(...)
+     |      x.__truediv__(y) <==> x/y
+     |  
+     |  x(...)
+     |      Vector.x(float)
+     |      Vector.x() -> float
+     |  
+     |  y(...)
+     |      Vector.y(float)
+     |      Vector.y() -> float
+     |  
+     |  z(...)
+     |      Vector.z(float)
+     |      Vector.z() -> float
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class VectorVel(sip.wrapper)
+     |  VectorVel()
+     |  VectorVel(Vector, Vector)
+     |  VectorVel(Vector)
+     |  VectorVel(VectorVel)
+     |  
+     |  Method resolution order:
+     |      VectorVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  Norm(...)
+     |      VectorVel.Norm() -> doubleVel
+     |  
+     |  ReverseSign(...)
+     |      VectorVel.ReverseSign()
+     |  
+     |  Zero(...)
+     |      VectorVel.Zero() -> VectorVel
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __div__(...)
+     |      x.__div__(y) <==> x/y
+     |  
+     |  __iadd__(...)
+     |      x.__iadd__(y) <==> x+=y
+     |  
+     |  __isub__(...)
+     |      x.__isub__(y) <==> x-=y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __neg__(...)
+     |      x.__neg__() <==> -x
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rdiv__(...)
+     |      x.__rdiv__(y) <==> y/x
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __rsub__(...)
+     |      x.__rsub__(y) <==> y-x
+     |  
+     |  __rtruediv__(...)
+     |      x.__rtruediv__(y) <==> y/x
+     |  
+     |  __sub__(...)
+     |      x.__sub__(y) <==> x-y
+     |  
+     |  __truediv__(...)
+     |      x.__truediv__(y) <==> x/y
+     |  
+     |  deriv(...)
+     |      VectorVel.deriv() -> Vector
+     |  
+     |  value(...)
+     |      VectorVel.value() -> Vector
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  p
+     |  
+     |  v
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class Wrench(sip.wrapper)
+     |  Wrench()
+     |  Wrench(Vector, Vector)
+     |  Wrench(Wrench)
+     |  
+     |  Method resolution order:
+     |      Wrench
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  RefPoint(...)
+     |      Wrench.RefPoint(Vector) -> Wrench
+     |  
+     |  ReverseSign(...)
+     |      Wrench.ReverseSign()
+     |  
+     |  Zero(...)
+     |      Wrench.Zero() -> Wrench
+     |  
+     |  __add__(...)
+     |      x.__add__(y) <==> x+y
+     |  
+     |  __delitem__(...)
+     |      x.__delitem__(y) <==> del x[y]
+     |  
+     |  __div__(...)
+     |      x.__div__(y) <==> x/y
+     |  
+     |  __eq__(...)
+     |      x.__eq__(y) <==> x==y
+     |  
+     |  __ge__(...)
+     |      x.__ge__(y) <==> x>=y
+     |  
+     |  __getitem__(...)
+     |      x.__getitem__(y) <==> x[y]
+     |  
+     |  __gt__(...)
+     |      x.__gt__(y) <==> x>y
+     |  
+     |  __iadd__(...)
+     |      x.__iadd__(y) <==> x+=y
+     |  
+     |  __isub__(...)
+     |      x.__isub__(y) <==> x-=y
+     |  
+     |  __le__(...)
+     |      x.__le__(y) <==> x<=y
+     |  
+     |  __lt__(...)
+     |      x.__lt__(y) <==> x<y
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __ne__(...)
+     |      x.__ne__(y) <==> x!=y
+     |  
+     |  __neg__(...)
+     |      x.__neg__() <==> -x
+     |  
+     |  __radd__(...)
+     |      x.__radd__(y) <==> y+x
+     |  
+     |  __rdiv__(...)
+     |      x.__rdiv__(y) <==> y/x
+     |  
+     |  __reduce__ = _pickle_type(...)
+     |  
+     |  __repr__(...)
+     |      x.__repr__() <==> repr(x)
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  __rsub__(...)
+     |      x.__rsub__(y) <==> y-x
+     |  
+     |  __rtruediv__(...)
+     |      x.__rtruediv__(y) <==> y/x
+     |  
+     |  __setitem__(...)
+     |      x.__setitem__(i, y) <==> x[i]=y
+     |  
+     |  __sub__(...)
+     |      x.__sub__(y) <==> x-y
+     |  
+     |  __truediv__(...)
+     |      x.__truediv__(y) <==> x/y
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  force
+     |  
+     |  torque
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+    
+    class doubleVel(sip.wrapper)
+     |  doubleVel()
+     |  doubleVel(doubleVel)
+     |  
+     |  Method resolution order:
+     |      doubleVel
+     |      sip.wrapper
+     |      sip.simplewrapper
+     |      __builtin__.object
+     |  
+     |  Methods defined here:
+     |  
+     |  __mul__(...)
+     |      x.__mul__(y) <==> x*y
+     |  
+     |  __rmul__(...)
+     |      x.__rmul__(y) <==> y*x
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors defined here:
+     |  
+     |  __weakref__
+     |      list of weak references to the object (if defined)
+     |  
+     |  grad
+     |  
+     |  t
+     |  
+     |  ----------------------------------------------------------------------
+     |  Methods inherited from sip.simplewrapper:
+     |  
+     |  __init__(...)
+     |      x.__init__(...) initializes x; see help(type(x)) for signature
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data descriptors inherited from sip.simplewrapper:
+     |  
+     |  __dict__
+     |  
+     |  ----------------------------------------------------------------------
+     |  Data and other attributes inherited from sip.simplewrapper:
+     |  
+     |  __new__ = <built-in method __new__ of sip.wrappertype object>
+     |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+
+FUNCTIONS
+    Add(...)
+        Add(JntArray, JntArray, JntArray)
+        Add(JntArrayVel, JntArrayVel, JntArrayVel)
+        Add(JntArrayVel, JntArray, JntArrayVel)
+        Add(JntSpaceInertiaMatrix, JntSpaceInertiaMatrix, JntSpaceInertiaMatrix)
+    
+    Divide(...)
+        Divide(JntArray, float, JntArray)
+        Divide(JntArrayVel, float, JntArrayVel)
+        Divide(JntArrayVel, doubleVel, JntArrayVel)
+        Divide(JntSpaceInertiaMatrix, float, JntSpaceInertiaMatrix)
+    
+    Equal(...)
+        Equal(Vector, Vector, float eps=epsilon) -> bool
+        Equal(Rotation, Rotation, float eps=epsilon) -> bool
+        Equal(Frame, Frame, float eps=epsilon) -> bool
+        Equal(Twist, Twist, float eps=epsilon) -> bool
+        Equal(Wrench, Wrench, float eps=epsilon) -> bool
+        Equal(JntArray, JntArray, float eps=epsilon) -> bool
+        Equal(JntArrayVel, JntArrayVel, float eps=epsilon) -> bool
+        Equal(doubleVel, doubleVel, float eps=epsilon) -> bool
+        Equal(VectorVel, VectorVel, float eps=epsilon) -> bool
+        Equal(Vector, VectorVel, float eps=epsilon) -> bool
+        Equal(VectorVel, Vector, float eps=epsilon) -> bool
+        Equal(RotationVel, RotationVel, float eps=epsilon) -> bool
+        Equal(Rotation, RotationVel, float eps=epsilon) -> bool
+        Equal(RotationVel, Rotation, float eps=epsilon) -> bool
+        Equal(FrameVel, FrameVel, float eps=epsilon) -> bool
+        Equal(Frame, FrameVel, float eps=epsilon) -> bool
+        Equal(FrameVel, Frame, float eps=epsilon) -> bool
+        Equal(TwistVel, TwistVel, float eps=epsilon) -> bool
+        Equal(Twist, TwistVel, float eps=epsilon) -> bool
+        Equal(TwistVel, Twist, float eps=epsilon) -> bool
+        Equal(JntSpaceInertiaMatrix, JntSpaceInertiaMatrix, float eps=epsilon) -> bool
+    
+    Multiply(...)
+        Multiply(JntArray, float, JntArray)
+        Multiply(JntArrayVel, float, JntArrayVel)
+        Multiply(JntArrayVel, doubleVel, JntArrayVel)
+        Multiply(JntSpaceInertiaMatrix, float, JntSpaceInertiaMatrix)
+        Multiply(JntSpaceInertiaMatrix, JntArray, JntArray)
+    
+    MultiplyJacobian(...)
+        MultiplyJacobian(Jacobian, JntArray, Twist)
+    
+    SetToZero(...)
+        SetToZero(Vector)
+        SetToZero(Twist)
+        SetToZero(Wrench)
+        SetToZero(JntArray)
+        SetToZero(JntArrayVel)
+        SetToZero(Jacobian)
+        SetToZero(TwistVel)
+        SetToZero(JntSpaceInertiaMatrix)
+    
+    Subtract(...)
+        Subtract(JntArray, JntArray, JntArray)
+        Subtract(JntArrayVel, JntArrayVel, JntArrayVel)
+        Subtract(JntArrayVel, JntArray, JntArrayVel)
+        Subtract(JntSpaceInertiaMatrix, JntSpaceInertiaMatrix, JntSpaceInertiaMatrix)
+    
+    addDelta(...)
+        addDelta(Vector, Vector, float dt=1) -> Vector
+        addDelta(Rotation, Vector, float dt=1) -> Rotation
+        addDelta(Frame, Twist, float dt=1) -> Frame
+        addDelta(Twist, Twist, float dt=1) -> Twist
+        addDelta(Wrench, Wrench, float dt=1) -> Wrench
+        addDelta(doubleVel, doubleVel, float dt=1) -> doubleVel
+        addDelta(VectorVel, VectorVel, float dt=1) -> VectorVel
+        addDelta(RotationVel, VectorVel, float dt=1) -> RotationVel
+        addDelta(FrameVel, TwistVel, float dt=1) -> FrameVel
+    
+    changeBase(...)
+        changeBase(Jacobian, Rotation, Jacobian)
+    
+    changeRefFrame(...)
+        changeRefFrame(Jacobian, Frame, Jacobian)
+    
+    changeRefPoint(...)
+        changeRefPoint(Jacobian, Vector, Jacobian)
+    
+    diff(...)
+        diff(Vector, Vector, float dt=1) -> Vector
+        diff(Rotation, Rotation, float dt=1) -> Vector
+        diff(Frame, Frame, float dt=1) -> Twist
+        diff(Twist, Twist, float dt=1) -> Twist
+        diff(Wrench, Wrench, float dt=1) -> Wrench
+        diff(doubleVel, doubleVel, float dt=1) -> doubleVel
+        diff(VectorVel, VectorVel, float dt=1) -> VectorVel
+        diff(RotationVel, RotationVel, float dt=1) -> VectorVel
+        diff(FrameVel, FrameVel, float dt=1) -> TwistVel
+    
+    dot(...)
+        dot(Vector, Vector) -> float
+        dot(Twist, Wrench) -> float
+        dot(Wrench, Twist) -> float
+        dot(VectorVel, VectorVel) -> doubleVel
+        dot(VectorVel, Vector) -> doubleVel
+        dot(Vector, VectorVel) -> doubleVel
+
+DATA
+    __license__ = dict_proxy({'Timestamp': '2014', 'Type': 'LGPL',...n Smi...
+
+

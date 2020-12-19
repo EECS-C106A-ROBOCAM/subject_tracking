@@ -1,0 +1,3 @@
+geometry_msgs/PoseStamped input_pose
+---
+sensor_msgs/JointState output_joints
