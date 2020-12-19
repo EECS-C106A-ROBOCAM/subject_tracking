@@ -9,6 +9,7 @@ import numpy as np
 import kdl_parser_py.urdf as parser
 
 from tf_conversions import posemath
+from tf.transformations import euler_from_quaternion
 
 from geometry_msgs.msg import (
     PoseStamped,
@@ -70,11 +71,16 @@ def solveIK(targetFrame):
     # First, convert quaternion orientation to XZY order Euler angles
     targetQuat = targetFrame.M.GetQuaternion() # Get quaternion from KDL frame (x, y, z, w)
     pitch, yaw, roll = tf.transformations.euler_from_quaternion(targetQuat, axes='rxzy')
-
     pitch_deg, yaw_deg, roll_deg = math.degrees(pitch), math.degrees(yaw), math.degrees(roll)
 
-    # 1. Complete:
-    J4, J5_initial, J6 = pitch, yaw, roll
+    J4_origin_orientation = posemath.toMsg(chain.getSegment(2).getFrameToTip()).orientation
+    J4_offset = euler_from_quaternion([J4_origin_orientation.x, J4_origin_orientation.y, J4_origin_orientation.z, J4_origin_orientation.w])[0]
+
+    J4_raw, J5_initial, J6 = pitch, yaw, roll
+    J4 = J4_raw - J4_offset
+    # 1. Complete above
+
+    print("J4: {} J5_init: {} J6: {}".format(J4, J5_initial, J6))
 
     chainAngles = PyKDL.JntArray(8)
     chainAngles[5], chainAngles[6], chainAngles[7] = J4, J5_initial, J6
@@ -83,11 +89,12 @@ def solveIK(targetFrame):
     brownFrame = PyKDL.Frame()
     
     purpleSuccess = chainFK.JntToCart(chainAngles, purpleFrame)
-    brownSuccess = chainFK.JntToCart(chainAngles, brownFrame, segmentNr=7)
+    # print("Purple success {}".format(purpleSuccess))
 
-    print(chain.getNrOfJoints())
-    print("Purple FK Status: {}".format(purpleSuccess))
-    print("Brown FK Status: {}".format(brownSuccess))
+    print("Target Orientation:\n{}".format(targetFrame.M))
+    print("Result Orientation:\n{}".format(purpleFrame.M))
+    
+    brownSuccess = chainFK.JntToCart(chainAngles, brownFrame, segmentNr=7)
 
     # 2. Determine position of orange point
     # First, construct KDL chain of the 3 links involved in J4-J6
@@ -97,9 +104,9 @@ def solveIK(targetFrame):
     cameraOffsetChainFK = PyKDL.ChainFkSolverPos_recursive(cameraOffsetChain)
     cameraFrame = PyKDL.Frame()
     success = cameraOffsetChainFK.JntToCart(cameraJointAngles, cameraFrame)
-    print("FK Status: {}".format(success))
-    print("Camera Frame: {}".format(cameraFrame))
-    print("End Effector Joint Angles: {}".format([J4, J5_initial, J6]))
+    # print("FK Status: {}".format(success))
+    # print("Camera Frame: {}".format(cameraFrame))
+    # print("End Effector Joint Angles: {}".format([J4, J5_initial, J6]))
 
     orangePoint = targetFrame.p - (purpleFrame.p - brownFrame.p)
 
@@ -108,9 +115,9 @@ def solveIK(targetFrame):
     plotter.addVector(purpleFrame.p, "purple")
     plotter.addVector(brownFrame.p, "brown")
 
-    print("Target Frame Position: {}".format(targetFrame.p))
-    print("Camera Frame Position: {}".format(cameraFrame.p))
-    print("Offset: {}".format(targetFrame.p - cameraFrame.p))
+    # print("Target Frame Position: {}".format(targetFrame.p))
+    # print("Camera Frame Position: {}".format(cameraFrame.p))
+    # print("Offset: {}".format(targetFrame.p - cameraFrame.p))
 
     # 2. Complete:
     
@@ -118,15 +125,10 @@ def solveIK(targetFrame):
     orange_X, orange_Y, orange_Z = orangePoint
     orange_R = math.sqrt(orange_X ** 2 + orange_Y ** 2)
     orange_Theta = math.atan2(orange_Y, orange_X) # Theta measured from global positive X axis
-
-    purplePointStamped = PointStamped()
-    purplePointStamped.header.frame_id = "world"
-    purplePointStamped.header.stamp = rospy.Time.now()
-    purplePointStamped.point.x, purplePointStamped.point.y, purplePointStamped.point.z = 0, orange_R, orange_Z
     
     # 3. Complete: (above)
 
-    # print("Orange R: {} Theta: {}".format(orange_R, math.degrees(orange_Theta)))
+    print("Orange R: {} Theta: {}".format(orange_R, math.degrees(orange_Theta)))
 
     # 4. Solve for J2 and J3 in the idealized R-Z plane
     targetVectorOrig = PyKDL.Vector(0, orange_R, orange_Z)
@@ -183,29 +185,31 @@ def solveIK(targetFrame):
     J3_offset = elbowStartFrame.M.GetRPY()[0] # J3's zero position is below horizontal
     J3 = J3_initial - J3_offset
     # 4. Complete (above)
+
+    # print("J2: {} J3: {}".format(J2, J3))
     
     # 5. Use the Theta from cylindrical coordinates as the J1 angle, and update J5 accordingly
     J1 = orange_Theta - math.radians(90)
-    J5 = J5_initial - orange_Theta
+    J5 = J5_initial - (orange_Theta - math.radians(90))
     # 5. Complete (above)
+    
+    # print("J1: {} J5: {}".format(J1, J5))
 
     jointAngles = [J1, J2, J3, J4, J5, J6]
-    jointAngles_deg = [math.degrees(j) for j in jointAngles]
-    print("Final joint angles in radians: {}".format(jointAngles))
-    print("Final joint angles in degrees: {}".format(jointAngles_deg))
+    print("\n\nFinal joint angles in radians: {}\n\n".format(jointAngles))
 
     solvedJoints = PyKDL.JntArray(8)
     solvedJoints[0], solvedJoints[1], solvedJoints[3], solvedJoints[5], solvedJoints[6], solvedJoints[7] = jointAngles
-    solvedJoints[2], solvedJoints[4] = solvedJoints[1], solvedJoints[3]
+    solvedJoints[2], solvedJoints[4] = -1 * solvedJoints[1], -1 * solvedJoints[3]
     producedFrame = PyKDL.Frame()
 
     for i in range(chain.getNrOfSegments()):
         rc = chainFK.JntToCart(solvedJoints, producedFrame, segmentNr=i)
         plotter.addVector(producedFrame.p, "fk_produced_{}".format(i))
 
-    print("Result: {}".format(rc))
-    print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
-    print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
+    # print("Result: {}".format(rc))
+    # print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
+    # print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
 
 
     # 6. (optional) Sanity check on solution:
@@ -223,70 +227,18 @@ def solveIK(targetFrame):
     return ret
 
 
-def sanityTest(BASE_TO_BASE_YAW, BASE_YAW_TO_BOTTOM_4B, targetFrame, cameraFrame, cameraOffsetChain, jointAngles):
-    completeArmChain = PyKDL.Chain()
-    
-    baseYawJoint = PyKDL.Joint(PyKDL.Joint.RotZ)
-    bot4BJoint = PyKDL.Joint(PyKDL.Joint.RotX)
-    top4BJoint = PyKDL.Joint(PyKDL.Joint.RotX)
-
-    # Use Fake joints to artificially create 4 bar parallel constraint
-    bot4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
-    top4BFakeJoint = PyKDL.Joint(PyKDL.Joint.RotX)
-
-    baseToBaseYaw = PyKDL.Frame(BASE_TO_BASE_YAW)
-    baseYawToBot4B = PyKDL.Frame(BASE_YAW_TO_BOTTOM_4B)
-    """
-    bot4BToBot4BFake = PyKDL.Frame(PyKDL.Vector(0, 0, a1))
-    bot4BFakeToTop4B = PyKDL.Frame(PyKDL.Vector(0, elbowOffset_RZ[0], elbowOffset_RZ[1]))
-    top4BToTop4BFake = PyKDL.Frame(PyKDL.Vector(0, a2 * math.cos(J3_offset), a2 * math.sin(J3_offset)))
-    """
-    # TODO(JS): Remove need for this magic stuff
-    fixedBaseJoint = PyKDL.Joint(PyKDL.Joint.RotX) # won't actually spin
-    magic4BJoint = PyKDL.Joint(PyKDL.Joint.RotX) # won't actually sping
-    magic4BFrame = PyKDL.Frame(targetFrame.p - cameraFrame.p)
-    
-    baseSegment = PyKDL.Segment(fixedBaseJoint, baseToBaseYaw)
-    baseYawSegment = PyKDL.Segment(baseYawJoint, baseYawToBot4B)
-    magic4BSegment = PyKDL.Segment(magic4BJoint, magic4BFrame)
-
-    completeArmChain.addSegment(baseSegment)
-    completeArmChain.addSegment(baseYawSegment)
-    completeArmChain.addSegment(magic4BSegment)
-    completeArmChain.addChain(cameraOffsetChain)
-
-    completeArmChainFK = PyKDL.ChainFkSolverPos_recursive(completeArmChain)
-
-    solvedJoints = PyKDL.JntArray(6)
-    solvedJoints[0] = 0 # Fake joint
-    solvedJoints[1] = jointAngles[0]
-    solvedJoints[2] = 0 # Fake joint
-    solvedJoints[3] = jointAngles[3]
-    solvedJoints[4] = jointAngles[4]
-    solvedJoints[5] = jointAngles[5]
-
-    print("# Joints: {} # Segments: {}".format(completeArmChain.getNrOfJoints(), completeArmChain.getNrOfSegments()))
-    
-    producedFrame = PyKDL.Frame()
-    rc = completeArmChainFK.JntToCart(solvedJoints, producedFrame)
-    print("Result: {}".format(rc))
-    print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
-    print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
-
 def testIK():
-    """ CHANGE ME """
-    pitch_deg, yaw_deg, roll_deg = 0, 90, 0 #np.random.uniform(-90, 90), np.random.uniform(-90, 90), np.random.uniform(-90, 90)
-    x, y, z = 0, 0.34077, 0.31777 # in meters
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        tf_listener.waitForTransform("base", "link_camera", rospy.Time(), rospy.Duration(10.0))
+        targetFrame_tf = tf_listener.lookupTransform('base', 'link_camera', rospy.Time(0))
+        
+        targetFrame = posemath.fromTf(targetFrame_tf)
 
-    targetVector = PyKDL.Vector(x, y, z)
-
-    pitch, yaw, roll = math.radians(pitch_deg), math.radians(yaw_deg), math.radians(roll_deg)
-    targetQuat = tf.transformations.quaternion_from_euler(pitch, yaw, roll, axes='rxzy')
-
-    print("Input quaternion: {}".format(targetQuat))
-    targetRotation = PyKDL.Rotation.Quaternion(*targetQuat)
-
-    targetFrame = PyKDL.Frame(targetRotation, targetVector)
+        print("Input quaternion: {}".format(targetFrame.M.GetQuaternion()))
+        print("Input vector: {}".format(targetFrame.p))
+        
+        jointAngles = solveIK(targetFrame)
 
     jointAngles = solveIK(targetFrame)
     print("sent!")
