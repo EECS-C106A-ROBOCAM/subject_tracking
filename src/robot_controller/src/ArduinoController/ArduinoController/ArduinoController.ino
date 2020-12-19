@@ -75,6 +75,11 @@ bool jointToMotorAngles(float* jointInputArray, short* motorOutputArray) {
       angle *= 180.0 / 270.0;
     }
 
+    if (i >= 1 && i < 4) {
+      // For pitch and four-bar joints, invert angle
+      angle *= -1;
+    }
+
     angle += 90; // Since 90 is the center of the range
 
     motorOutputArray[i] = short(angle); // Narrowing from float to short

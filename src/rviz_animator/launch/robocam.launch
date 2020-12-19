@@ -2,18 +2,18 @@
 
     <param name="robot_description" command="cat $(find rviz_animator)/models/robocam.xml" />
 
-    <node pkg="a" type="robot_state_publisher" name="robot_state_publisher" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
 
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 -0.3 0 0 0 0 1 world base" />
 
-    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
+    <!-- <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
         <param name="use_gui" value="true"/>
-    </node>
+    </node> -->
     
-    <node pkg="obj_tracking" type="objTracker.py" name="objTracker" output="screen"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rviz_animator)/rviz/robocam.rviz" />
-    <node pkg="ik_solver" type="CustomIKSolver.py" name="ik_service" output="screen"/>
     <node pkg="rviz_animator" type="choreographer.py" name="choreographer" output="screen"/>
+    <node pkg="ik_solver" type="CustomIKSolver.py" name="ik_service" output="screen"/>
+    <node pkg="obj_tracking" type="objTracker.py" name="objTracker"/>
     <node pkg="robot_controller" type="robot_controller.py" name="robot_controller" />
     
 
