@@ -23,6 +23,37 @@ from ik_solver.srv import (
     SolveIKSrv
 )
 
+class Plotter:
+    def __init__(self):
+        self.publishers = []
+        self.toPublish = []
+        self.labels = []
+        self.goalState = JointState()
+
+    def addGoal(self, goalState):
+        self.publishers.append(rospy.Publisher("joint_states", JointState, queue_size=10))
+        self.toPublish.append(goalState)
+        self.labels.append("joint_states")
+
+    def addVector(self, vector, label):
+        point = PointStamped()
+        point.header.stamp = rospy.Time.now()
+        point.header.frame_id = "world"
+        point.point.x, point.point.y, point.point.z = vector
+
+        self.publishers.append(rospy.Publisher("pub_{}".format(label), PointStamped, queue_size=10))
+        self.toPublish.append(point)
+        self.labels.append("pub_" + label)
+
+    def publish(self):
+        print("Publishing...")
+        print("Labels: \n{}".format(self.labels))
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            for tp, publisher in zip(self.toPublish, self.publishers):
+                publisher.publish(tp)
+            rate.sleep()
+
 def callback(req):
     targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
 
@@ -31,7 +62,7 @@ def solveIK(targetFrame):
     ok, tree = parser.treeFromFile(rospkg.RosPack().get_path('rviz_animator') + "/models/robocam.xml")
     chain = tree.getChain('base', 'link_camera')
 
-    plotter = VectorPlotter()
+    plotter = Plotter()
 
     # 1. Solve for J4, J5_initial, J6
     # First, convert quaternion orientation to XZY order Euler angles
@@ -174,32 +205,19 @@ def solveIK(targetFrame):
     print("Output position: {}\nExpected position: {}".format(producedFrame.p, targetFrame.p))
     print("Output orientation: {}\nExpected orientation: {}".format(producedFrame.M, targetFrame.M))
 
-    plotter.publishPoints()
 
     # 6. (optional) Sanity check on solution:
-    sanityTest(BASE_TO_BASE_YAW, BASE_YAW_TO_BOTTOM_4B, targetFrame, cameraFrame, cameraOffsetChain, jointAngles)
+    # sanityTest(BASE_TO_BASE_YAW, BASE_YAW_TO_BOTTOM_4B, targetFrame, cameraFrame, cameraOffsetChain, jointAngles)
 
     # 7. Create JointState message for return
     ret = JointState()
+    ret.name = ['joint_base_rot', 'joint_rot_1', 'joint_f1_2', 'joint_f2_pitch', 'joint_pitch_yaw', 'joint_yaw_roll']
     ret.header.stamp = rospy.Time.now()
     ret.position = jointAngles
+    
+    plotter.addGoal(ret)
+    plotter.publish()
 
-    orangePointStamped = PointStamped()
-    orangePointStamped.header.frame_id = "world"
-    orangePointStamped.header.stamp = rospy.Time.now()
-    orangePointStamped.point.x, orangePointStamped.point.y, orangePointStamped.point.z = orangePoint
-
-    pinkPointStamped = PointStamped()
-    pinkPointStamped.header.frame_id = "world"
-    pinkPointStamped.header.stamp = rospy.Time.now()
-
-    pinkPointStamped.point.x, pinkPointStamped.point.y, pinkPointStamped.point.z = targetFrame.p
-
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
-        pub.publish(orangePointStamped)
-        pub2.publish(pinkPointStamped)
-        rate.sleep()
     return ret
 
 
@@ -270,34 +288,7 @@ def testIK():
 
     jointAngles = solveIK(targetFrame)
     print("sent!")
-
-class VectorPlotter:
-    def __init__(self):
-        self.publishers = []
-        self.points = []
-        self.labels = []
-
-    def addVector(self, vector, label):
-        point = PointStamped()
-        point.header.stamp = rospy.Time.now()
-        point.header.frame_id = "world"
-        point.point.x, point.point.y, point.point.z = vector
-
-        self.publishers.append(rospy.Publisher("pub_{}".format(label), PointStamped, queue_size=10))
-        self.points.append(point)
-        self.labels.append("pub_" + label)
-
-    def publishPoints(self):
-        print("Publishing points...")
-        print("Labels: \n{}".format(self.labels))
-        rate = rospy.Rate(10)
-        while not rospy.is_shutdown():
-            for point, publisher in zip(self.points, self.publishers):
-                publisher.publish(point)
-            rate.sleep()
     
-
-
 if __name__ == "__main__":
     rospy.init_node("custom_ik_solver", anonymous=True)
     s = rospy.Service("solve_ik", SolveIKSrv, callback)
