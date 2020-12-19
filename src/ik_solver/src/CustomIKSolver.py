@@ -20,7 +20,8 @@ from sensor_msgs.msg import (
 )
 
 from ik_solver.srv import (
-    SolveIKSrv
+    SolveIKSrv,
+    SolveIKSrvResponse
 )
 
 class Plotter:
@@ -56,7 +57,7 @@ class Plotter:
 
 def callback(req):
     targetFrame = posemath.fromMsg(req.input_pose.pose) # Target pose as KDL frame
-    return SolveIKSrv(solveIK(targetFrame))
+    return SolveIKSrvResponse(solveIK(targetFrame))
 
 
 def solveIK(targetFrame):
@@ -217,7 +218,7 @@ def solveIK(targetFrame):
     ret.position = jointAngles
     
     plotter.addGoal(ret)
-    plotter.publish()
+    # plotter.publish()
 
     return ret
 

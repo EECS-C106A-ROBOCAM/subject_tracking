@@ -2,6 +2,7 @@
 
 import sys
 import time
+import math
 import PyKDL
 import rospy
 import rospkg
@@ -16,6 +17,7 @@ warnings.filterwarnings('ignore', category=UserWarning)
 import quaternion
 
 from tf_conversions import posemath
+from tf.transformations import quaternion_from_euler, quaternion_multiply
 from scipy.interpolate import interp1d
 
 from rviz_animator.msg import KeyframesMsg
@@ -32,7 +34,7 @@ from sensor_msgs.msg import (
 )
 
 from ik_solver.srv import (
-    SolveIK
+    SolveIKSrv
 )
 
 def createSequence(keyframes, dt=0.1):
@@ -91,9 +93,12 @@ def callback(message):
             continue
 
         target_pose = do_transform_pose(pose, transform_object_to_base)
+        # quat_rot = quaternion_from_euler(0, 0, math.pi/2)
+        # target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w = quaternion_multiply(quat_rot, [target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w])
         try:
-            solve_ik = rospy.ServiceProxy('solve_ik', SolveIK)
-            response = solve_ik(target_pose, current_joints)
+            solve_ik = rospy.ServiceProxy('solve_ik', SolveIKSrv)
+            print(target_pose)
+            response = solve_ik(target_pose)
             target_joints = response.output_joints
             current_joints = target_joints
         except rospy.ServiceException as e:

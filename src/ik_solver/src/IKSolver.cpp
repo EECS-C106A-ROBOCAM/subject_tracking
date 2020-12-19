@@ -3,9 +3,9 @@
 #include <tf/transform_datatypes.h>
 
 #include <sensor_msgs/JointState.h>
-#include "ik_solver/SolveIK.h"
+#include "ik_solver/SolveIKSrv.h"
 
-bool solveIK(ik_solver::SolveIK::Request& req, ik_solver::SolveIK::Response& res) {
+bool solveIK(ik_solver::SolveIKSrv::Request& req, ik_solver::SolveIKSrv::Response& res) {
 
   tf::Transform targetPose;
   tf::poseMsgToTF(req.input_pose.pose, targetPose);
