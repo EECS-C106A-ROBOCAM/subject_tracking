@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /TF1/Frames1/tracked_object1
         - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 595
@@ -18,12 +19,6 @@ Panels:
       - /Publish Point1
       - /Keyframe Tool1
       - /Keyframe Tool1/Keyframes1
-      - /Keyframe Tool1/Keyframes1/Keyframe 01
-      - /Keyframe Tool1/Keyframes1/Keyframe 01/Position1
-      - /Keyframe Tool1/Keyframes1/Keyframe 11
-      - /Keyframe Tool1/Keyframes1/Keyframe 11/Position1
-      - /Keyframe Tool1/Keyframes1/Keyframe 11/Orientation1
-      - /Keyframe Tool1/Keyframes1/Keyframe 21
     Name: Tool Properties
     Splitter Ratio: 0.588679016
   - Class: rviz/Views
@@ -217,74 +212,32 @@ Visualization Manager:
       Topic: /clicked_point
     - Class: rviz_animator/KeyframeTool
       Keyframe Tool:
-        Keyframes:
-          - Active?: true
-            ID: 16
-            Label: keyframe_id_16
-            Name: Keyframe 0
-            Orientation:
-              W: 0.913426578
-              X: 0.30320698
-              Y: 0.0855367407
-              Z: 0.257683814
-            Position:
-              X: 0.137405381
-              Y: -0.0916830003
-              Z: 0.31980738
-            Timestamp: 0
-          - Active?: true
-            ID: 17
-            Label: keyframe_id_17
-            Name: Keyframe 1
-            Orientation:
-              W: 0.857433617
-              X: 0.370630413
-              Y: -0.141643867
-              Z: -0.327685505
-            Position:
-              X: -0.18391636
-              Y: -0.104933001
-              Z: 0.272974104
-            Timestamp: 10
-          - Active?: true
-            ID: 20
-            Label: keyframe_id_20
-            Name: Keyframe 2
-            Orientation:
-              W: 0.837922931
-              X: 0.157242969
-              Y: 0.0963962525
-              Z: 0.513680458
-            Position:
-              X: 0.121321164
-              Y: -0.0483274609
-              Z: 0.297619194
-            Timestamp: 0
+        Keyframes: ~
         Topic: /operator_keyframes
-        current_keyframe_id: 21
+        current_keyframe_id: 16
   Value: true
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.323229164
+      Distance: 2.73854089
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0168888848
-        Y: 0.00483766384
-        Z: -0.003619025
+        X: 0.06595359
+        Y: 0.115389064
+        Z: 0.184301421
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.19979513
+      Pitch: 0.244796067
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.81229448
+      Yaw: 2.76729393
     Saved: ~
 Window Geometry:
   Displays:
