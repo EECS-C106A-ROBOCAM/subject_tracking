@@ -11,11 +11,8 @@ KDL install:
 Quaternion install:
 `python -m pip install numpy-quaternion`
 
-### Running Simulation
-To load Baxter into Gazebo, run `/baxter.sh sim` followed by `roslaunch baxter_gazebo baxter_world.launch right_electric_gripper:=false left_electric_gripper:=false`. 
+Please run `catkin_make` and `source devel/setup.bash` as necessary, and install any other library dependencies (e.g. scipy) with pip or conda if prompted.
 
-To load the moving subject (and the walled surface upon which it randomly moves) into Gazebo, run `rosrun object_movement simulate_movement.py` in a seperate terminal.
+### ROBOCAM Execution
+To setup all the necessary services and nodes required for the sensing, planning, and actuation of ROBOCAM, please begin by running `roslaunch rviz_animator robocam.launch`. This should also open up an RViz interface, pre-configured with the RobotModel and the current frame of the nonstationary/stationary subject being tracked. Within this RViz environment is enabled ROBOCAM's custom Keyframe planning and publishing plugin, from which you as the operator can set Keyframes - goal poses and the timestamps to reach those poses at. To do so, you can simply adjusts your current view to a desired pose, and presses the "K" key on your keyboard to place a Keyframe at that position and orientation. Once the Keyframe has been created, you may adjust the designated timestamp of the Keyframe, its name, or delete it all together if you so choose. After repeating this process until you are satisfied with your created sequence, you may check the `Publish?` box in the plugin's viewing pane to send that target to the robot, which then actuates with respect to the tracked subject while maintaining fidelity to your operator-defined Keyframes. Even if you do not have a physical ROBOCAM available, RViz will visualize the execution in real-time simulation.
 
-To initialize the MoveIt arm path planner and manipulator arm controller, run `rosrun baxter_tools enable_robot.py -e` followed by `rosrun baxter_interface joint_trajectory_action_server.py`. Then, in a seperate terminal, run  `roslaunch baxter_moveit_config demo_baxter.launch right_electric_gripper:=false left_electric_gripper:=false`. Finally, in yet another terminal, run `rosrun manipulator_sim arm_controller.py` to initialize the arm to its starting position and begin listening for relative poses to move along from the camera (left arm camera image_raw feed can be seen live in rviz).
-
-Make sure to `source devel/setup.bash` whenever necessary.
