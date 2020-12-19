@@ -67,6 +67,6 @@ def track_aruco(message):
 
 if __name__ == '__main__':
     tf2Broadcast = tf2_ros.TransformBroadcaster()
-    rospy.init_node("aruco_tracker")
+    rospy.init_node("obj_tracker")
     sub = rospy.Subscriber("subject_image_raw", Image, track_aruco)
     rospy.spin()
